@@ -24,14 +24,14 @@ export default {
 <style scoped>
 #root{
   height: 100%;
+  display: flex;
+  flex-direction: row
 }
 #left-col {
-  float: left;
-  height: 100%;
-  width: 20%;
+  flex: 0 0 240px;
 }
 #right-col{
-  float: right;
-  width: 80%;
+  flex: 1 1 auto;
+  overflow: auto;
 }
 </style>

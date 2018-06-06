@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import store from '@/store/store'
 import Router from 'vue-router'
 
 import Container from '@/components/container/container'
@@ -75,8 +74,8 @@ export default new Router({
             },
             {
               path: 'shift-arrange',
-              name: 'DoctorArrange',
-              component: DoctorArrange,
+              name: 'ShiftArrange',
+              component: ShiftArrange,
             }
           ]
         }, {
