@@ -4,28 +4,28 @@
             <li><router-link to="/">Main Page</router-link></li>
             <li>Manager</li>
             <ul>
-                <li><router-link to="doctor-list-manage"> doctor list</router-link></li>
-                <li>type list</li>
-                <li>calender</li>
-                <li>sheet manage</li>
+                <li><router-link to="/doctor-list-manage">doctor list</router-link></li>
+                <li><router-link to="/type-list-manage">type list</router-link></li>
+                <li><router-link to="/calender-manage">calender</router-link></li>
+                <li><router-link to="/sheet-manage">sheet manage</router-link></li>
             </ul>
             <li>Arranger</li>
             <ul>
-                <li>sheet selector</li>
+                <li><router-link to="/sheet-select">sheet select</router-link></li>
                 <ul>
-                    <li>doctor</li>
-                    <li>type</li>
-                    <li>workhour</li>
-                    <li>shift</li>
+                    <li><router-link to="/sheet-select/doctor-arrange">doctor</router-link></li>
+                    <li><router-link to="/sheet-select/type-arrange">type</router-link></li>
+                    <li><router-link to="/sheet-select/workhour-arrange">workhour</router-link></li>
+                    <li><router-link to="/sheet-select/shift-arrange">shift</router-link></li>
                 </ul>
             </ul>
-            <li>Doctor</li>
+            <li>Employee</li>
             <ul>
-                <li>request date</li>
+                <li><router-link to="/book-date">book date</router-link></li>
             </ul>
             <li>Querier</li>
             <ul>
-                <li>sheet query</li>
+                <li><router-link to="/sheet-query">sheet query</router-link></li>
             </ul>
         </ul>
     </div>
