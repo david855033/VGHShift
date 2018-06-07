@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h4>sheet Manage</h4>
+        <h4>Sheet Manage</h4>
         <table class="table">
             <thead>
                 <tr>

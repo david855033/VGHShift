@@ -7,6 +7,7 @@
                     <th>doctor_id</th>
                     <th>id</th>
                     <th>name</th>
+                    <th>grade</th>
                     <th>section</th>
                     <th>phs</th>
                     <th>code</th>
@@ -17,6 +18,7 @@
                     <td>{{e.doctor_id}}</td>
                     <td>{{e.id}}</td>
                     <td>{{e.name}}</td>
+                    <td>{{e.grade}}</td>
                     <td>{{e.section}}</td>
                     <td>{{e.phs}}</td>
                     <td>{{e.code}}</td>
