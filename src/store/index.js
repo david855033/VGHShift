@@ -36,8 +36,17 @@ export default new Vuex.Store({
             { date: '2018-07-15', weekday: "0", is_holiday: true, description: "" }
         ],
         sheetTable: [
-            { sheet_id: 'S01', year: '2018', month: '7', section: 'PED', version: '1', status: 'working', content: '{"test":"1"}' },
+            { sheet_id: 'S01', year: '2018', month: '7', section: 'PED', version: '1', status: 'working', content: '' },
             { sheet_id: 'S02', year: '2018', month: '7', section: 'SURG', version: '1', status: 'working', content: '' }
+        ],
+        bookDate: [
+            {
+                doctor_id: 'D01', year: 2018, month: 7,
+                book_dates: JSON.stringify([
+                    { date: 1, expect: "n", description: "lazy" },
+                    { date: 2, expect: "n", description: "lazy" },
+                    { date: 3, expect: "n", description: "lazy" }])
+            }
         ]
     },
     getters,

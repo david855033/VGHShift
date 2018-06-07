@@ -38,7 +38,7 @@
       <router-link tag="button" :to="'/sheet-select/shift-arrange'" type="button" class="btn btn-sm btn-primary">shift-arrange</router-link>
       <router-link tag="button" :to="'/sheet-select'" type="button" class="btn btn-sm btn-primary">go back</router-link>
     </div>
-    <router-view id="manipulate" :sheet-content.sync="selectedSheetContent"></router-view>
+    <router-view id="manipulate" :sheet-content.sync="selectedSheetContent" :sheet-year.sync="selectedSheetYear" :sheet-month.sync="selectedSheetMonth"></router-view>
   </div>
 </template>
 <script>
@@ -47,6 +47,8 @@ export default {
   data() {
     return {
       selectedSheetID: "",
+      selectedSheetYear: "",
+      selectedSheetMonth: "",
       selectedSheetContent: {}
     };
   },
@@ -62,6 +64,8 @@ export default {
 
       if (selectedSheet) {
         vm.selectedSheetID = selectedSheet.sheet_id;
+        vm.selectedSheetYear = selectedSheet.year;
+        vm.selectedSheetMonth = selectedSheet.month;
         if (selectedSheet.content) {
           vm.selectedSheetContent = JSON.parse(selectedSheet.content);
         } else {
@@ -69,6 +73,8 @@ export default {
         }
       } else {
         vm.selectedSheetID = "";
+        vm.selectedSheetYear = "";
+        vm.selectedSheetMonth = "";
         vm.selectedSheetContent = {};
       }
       selectedSheetContent.doctorList = selectedSheetContent.doctorList || [];

@@ -10,6 +10,7 @@
                     <th>section</th>
                     <th>version</th>
                     <th>status</th>
+                    <th>content</th>
                 </tr>
             </thead>
             <tbody>
@@ -20,6 +21,7 @@
                     <td>{{e.section}}</td>
                     <td>{{e.version}}</td>
                     <td>{{e.status}}</td>
+                    <td>{{e.content}}</td>
                 </tr>
             </tbody>
         </table>

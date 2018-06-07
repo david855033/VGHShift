@@ -37,7 +37,7 @@
                     <th>name</th>
                     <th>code</th>
                     <th>group</th>
-                    <th>bookdate</th>
+                    <th>book_dates</th>
                 </tr>
             </thead>
             <tbody>
@@ -48,31 +48,29 @@
                     <td>{{e.name}}</td>
                     <td>{{e.code}}</td>
                     <td>{{e.group}}</td>
-                    <td>{{e.bookdate}}</td>
+                    <td>
+                        <div v-for="(book, i) in JSON.parse(e.book_dates)" :key="i"> {{book.date}},{{book.expect}},{{book.description}}
+                        </div>
+                    </td>
                 </tr>
             </tbody>
         </table>
+        <button type="button" class="btn btn-sm btn-primary" @click="fetchBookDate">更新bookdate</button>
     </div>
 </template>
 <script>
 import { mapGetters } from "vuex";
-
-let inArray = function(array, predicate) {
-  var length = array.length;
-  for (var i = 0; i < length; i++) {
-    if (predicate(array[i])) return true;
-  }
-  return false;
-};
+import util from "@/components/my-util";
 
 export default {
-  props: ["sheetContent"],
+  props: ["sheetContent","sheetYear","sheetMonth"],
   data() {
     return {};
   },
   computed: {
     ...mapGetters({
-      doctorByUserSection: "getDoctorByUserSection"
+      doctorByUserSection: "getDoctorByUserSection",
+      bookDatesByDoctorYearMonth: "getBookDatesByDoctorYearMonth"
     })
   },
   methods: {
@@ -80,13 +78,27 @@ export default {
       let vm = this;
       let sheetContent = vm.sheetContent;
       if (!sheetContent.doctorList) return;
-      let isAlreadyInList = inArray(
+      let isAlreadyInList = util.inArray(
         sheetContent.doctorList,
         x => x.doctor_id == e.doctor_id
       );
       if (!isAlreadyInList) {
-        let { doctor_id } = e;
-        sheetContent.doctorList.push({ doctor_id });
+        let { doctor_id, name, grade, section, code } = e;
+        util.fill_DoctorArrange(e, vm);
+        sheetContent.doctorList.push(e);
+      }
+    },
+    fetchBookDate() {
+      let vm = this;
+      let doctorList = vm.sheetContent.doctorList;
+      if (!doctorList) return;
+      for (var i = 0; i < doctorList.length; i++) {
+        let bookDates = vm.bookDatesByDoctorYearMonth(
+          doctorList[i].doctor_id,
+          vm.sheetYear,
+          vm.sheetMonth
+        );
+        doctorList[i].book_dates = bookDates;
       }
     }
   }
