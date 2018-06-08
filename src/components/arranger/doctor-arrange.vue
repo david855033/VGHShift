@@ -77,7 +77,7 @@ export default {
     addFromDoctorList(e) {
       let vm = this;
       let sheetContent = vm.sheetContent;
-      if (!sheetContent.doctorList) return;
+       if(!sheetContent.doctorList) return;
       let isAlreadyInList = util.inArray(
         sheetContent.doctorList,
         x => x.doctor_id == e.doctor_id

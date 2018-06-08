@@ -35,6 +35,7 @@
       <router-link tag="button" :to="'/sheet-select/doctor-arrange'" type="button" class="btn btn-sm btn-primary">doctor-arrange</router-link>
       <router-link tag="button" :to="'/sheet-select/type-arrange'" type="button" class="btn btn-sm btn-primary">type-arrange</router-link>
       <router-link tag="button" :to="'/sheet-select/workhour-arrange'" type="button" class="btn btn-sm btn-primary">workhour-arrange</router-link>
+      <router-link tag="button" :to="'/sheet-select/area-arrange'" type="button" class="btn btn-sm btn-primary">area-arrange</router-link>
       <router-link tag="button" :to="'/sheet-select/shift-arrange'" type="button" class="btn btn-sm btn-primary">shift-arrange</router-link>
       <router-link tag="button" :to="'/sheet-select'" type="button" class="btn btn-sm btn-primary">go back</router-link>
     </div>
@@ -60,25 +61,28 @@ export default {
     selectSheet(sheet_id) {
       let vm = this;
       let selectedSheet = vm.getSheetByID("S01");
-      let selectedSheetContent = {};
+      //--初始化SheetContent--//
+      let selectedSheetContent_ToLoad = {
+        doctorList: [],
+        typeList: [],
+        workhourList:[],
+        areaList: []
+      };
 
       if (selectedSheet) {
         vm.selectedSheetID = selectedSheet.sheet_id;
         vm.selectedSheetYear = selectedSheet.year;
         vm.selectedSheetMonth = selectedSheet.month;
         if (selectedSheet.content) {
-          vm.selectedSheetContent = JSON.parse(selectedSheet.content);
-        } else {
-          vm.selectedSheetContent = {};
+          selectedSheetContent_ToLoad = JSON.parse(selectedSheet.content);
         }
       } else {
         vm.selectedSheetID = "";
         vm.selectedSheetYear = "";
         vm.selectedSheetMonth = "";
-        vm.selectedSheetContent = {};
       }
-      selectedSheetContent.doctorList = selectedSheetContent.doctorList || [];
-      vm.selectedSheetContent = selectedSheetContent;
+
+      vm.selectedSheetContent = selectedSheetContent_ToLoad;
     }
   }
 };

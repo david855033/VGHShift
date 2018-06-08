@@ -20,5 +20,9 @@ export default {
         } else {
             return JSON.stringify([]);
         }
-    }
+    },
+    getTypeByUserSection: state => {
+        return state.typeTable.filter(type =>
+            state.currentUser.arrange_section.indexOf(type.section) >= 0)
+    },
 }

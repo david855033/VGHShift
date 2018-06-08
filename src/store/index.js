@@ -16,7 +16,10 @@ export default new Vuex.Store({
             { doctor_id: 'D03', id: 'Z123456789', name: "李小華", grade: "V", section: 'SURG', phs: '2345', code: 'DOC2456A' }
         ],
         typeTable: [
-            { type_id: 'T01', type_id: '1', section: 'PED', description: '住院醫師班', work_to_work: "1630-0730", work_to_holiday: "1630-0800", holiday_to_work: "0800-0730", holiday_to_holiday: "0800-0800" }
+            { type_id: 'T01', section: 'PED', description: '住院醫師班', work_to_work: "1630-0730", work_to_holiday: "1630-0800", holiday_to_work: "0800-0730", holiday_to_holiday: "0800-0800" }
+        ],
+        workhourTable: [
+            { workhour_id: 'W01', section: 'PED', description: '住院醫師上班日', start_work: '0730', end_work: '16:30', nap: '30', pm_off: '12:00'}
         ],
         calenderTable: [
             { date: '2018-07-01', weekday: "0", is_holiday: true, description: "" },

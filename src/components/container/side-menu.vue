@@ -39,6 +39,9 @@
                     <li>
                         <router-link to="/sheet-select/workhour-arrange">workhour</router-link>
                     </li>
+                     <li>
+                        <router-link to="/sheet-select/area-arrange">area</router-link>
+                    </li>
                     <li>
                         <router-link to="/sheet-select/shift-arrange">shift</router-link>
                     </li>

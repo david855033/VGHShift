@@ -13,6 +13,7 @@ import SheetSelect from '@/components/arranger/sheet-select'
 import DoctorArrange from '@/components/arranger/doctor-arrange'
 import TypeArrange from '@/components/arranger/type-arrange'
 import WorkhourArrange from '@/components/arranger/workhour-arrange'
+import AreaArrange from '@/components/arranger/area-arrange'
 import ShiftArrange from '@/components/arranger/shift-arrange'
 
 import BookDate from '@/components/employee/book-date'
@@ -72,6 +73,12 @@ export default new Router({
               name: 'WorkhourArrange',
               component: WorkhourArrange,
             },
+            {
+              path: 'area-arrange',
+              name: 'AreaArrange',
+              component: AreaArrange,
+            },
+            
             {
               path: 'shift-arrange',
               name: 'ShiftArrange',

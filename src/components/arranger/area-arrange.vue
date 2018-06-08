@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h5>從預設班型清單載入 (type filtered by user arrange_section)</h5>
+        <h5>本班表所使用班型</h5>
         <table class="table table-sm">
             <thead>
                 <tr>
@@ -15,35 +15,6 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(e,i) in typeByUserSection" :key="i">
-                    <td>{{e.type_id}}</td>
-                    <td>{{e.section}}</td>
-                    <td>{{e.description}}</td>
-                    <td>{{e.work_to_work}}</td>
-                    <td>{{e.work_to_holiday}}</td>
-                    <td>{{e.holiday_to_work}}</td>
-                    <td>{{e.holiday_to_holiday}}</td>
-                    <td>
-                        <button type="button" class="btn btn-sm py-0" @click="addFromTypeList(e)">加入</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <h5>本班表所使用班型</h5>
-        <table class="table table-sm">
-            <thead>
-                <tr>
-                    <th>type_id</th>
-                    <th>section</th>
-                    <th>description</th>
-                    <th>平平</th>
-                    <th>平假</th>
-                    <th>假平</th>
-                    <th>假假</th>
-
-                </tr>
-            </thead>
-            <tbody>
                 <tr v-for="(e,i) in sheetContent.typeList" :key="i">
                     <td>{{e.type_id}}</td>
                     <td>{{e.section}}</td>
@@ -52,7 +23,26 @@
                     <td>{{e.work_to_holiday}}</td>
                     <td>{{e.holiday_to_work}}</td>
                     <td>{{e.holiday_to_holiday}}</td>
-
+                    <td>
+                        <button type="button" class="btn btn-sm py-0" @click="createAreaFromTypeList(e)">新增值班區域</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <h5>值班區域</h5>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>type_id</th>
+                    <th>description</th>
+                    <th>available_grades</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(e,i) in sheetContent.areaList" :key="i">
+                    <td>{{e.type_id}}</td>
+                    <td>{{e.description}}</td>
+                    <td>{{e.available_grades}}</td>
                 </tr>
             </tbody>
         </table>
@@ -68,27 +58,15 @@ export default {
     typeByUserSection: "getTypeByUserSection"
   }),
   methods: {
-    addFromTypeList(e) {
+    createAreaFromTypeList(e) {
       let vm = this;
       let sheetContent = vm.sheetContent;
-      if (!sheetContent.typeList) return;
-      let isAlreadyInList = util.inArray(
-        sheetContent.typeList,
-        x => x.type_id == e.type_id
-      );
-      if (!isAlreadyInList) {
-        let {
-          type_id,
-          section,
-          description,
-          work_to_work,
-          work_to_holiday,
-          holiday_to_work,
-          holiday_to_holiday
-        } = e;
-        util.fill_TypeArrange(e, vm);
-        sheetContent.typeList.push(e);
-      }
+      if (!sheetContent.areaList) return;
+      sheetContent.areaList.push({
+        type_id: e.type_id,
+        description: "__description__",
+        available_grades: ["R1", "R2", "R3"]
+      });
     }
   }
 };
