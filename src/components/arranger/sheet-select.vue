@@ -1,6 +1,6 @@
 <template>
   <div id="sheet-select-root">
-    <div id="sheet-selector">
+    <div id="sheet-selector" v-if="selectedSheetID==''">
       <h4>Sheet Select (from sheets filtered by user's arrange_section)</h4>
       <table class="table">
         <thead>
@@ -25,21 +25,23 @@
         </tbody>
       </table>
     </div>
-    <div id="selected-sheet">
-      <h5>Selected Sheet</h5>
-      <div>
-        ID: {{selectedSheetID}}
+    <div v-if="selectedSheetID!=''">
+      <div id="selected-sheet">
+        <h5>Selected Sheet</h5>
+        <div>
+          ID: {{selectedSheetID}}
+        </div>
       </div>
+      <div id="buttons">
+        <router-link tag="button" :to="'/sheet-select/doctor-arrange'" type="button" class="btn btn-sm btn-primary">doctor-arrange</router-link>
+        <router-link tag="button" :to="'/sheet-select/type-arrange'" type="button" class="btn btn-sm btn-primary">type-arrange</router-link>
+        <router-link tag="button" :to="'/sheet-select/workhour-arrange'" type="button" class="btn btn-sm btn-primary">workhour-arrange</router-link>
+        <router-link tag="button" :to="'/sheet-select/area-arrange'" type="button" class="btn btn-sm btn-primary">area-arrange</router-link>
+        <router-link tag="button" :to="'/sheet-select/shift-arrange'" type="button" class="btn btn-sm btn-primary">shift-arrange</router-link>
+        <router-link tag="button" :to="'/sheet-select'" type="button" class="btn btn-sm btn-primary" @click.native="clearSelect">go back</router-link>
+      </div>
+      <router-view id="manipulate" :sheet-content.sync="selectedSheetContent" :sheet-year.sync="selectedSheetYear" :sheet-month.sync="selectedSheetMonth"></router-view>
     </div>
-    <div id="buttons">
-      <router-link tag="button" :to="'/sheet-select/doctor-arrange'" type="button" class="btn btn-sm btn-primary">doctor-arrange</router-link>
-      <router-link tag="button" :to="'/sheet-select/type-arrange'" type="button" class="btn btn-sm btn-primary">type-arrange</router-link>
-      <router-link tag="button" :to="'/sheet-select/workhour-arrange'" type="button" class="btn btn-sm btn-primary">workhour-arrange</router-link>
-      <router-link tag="button" :to="'/sheet-select/area-arrange'" type="button" class="btn btn-sm btn-primary">area-arrange</router-link>
-      <router-link tag="button" :to="'/sheet-select/shift-arrange'" type="button" class="btn btn-sm btn-primary">shift-arrange</router-link>
-      <router-link tag="button" :to="'/sheet-select'" type="button" class="btn btn-sm btn-primary">go back</router-link>
-    </div>
-    <router-view id="manipulate" :sheet-content.sync="selectedSheetContent" :sheet-year.sync="selectedSheetYear" :sheet-month.sync="selectedSheetMonth"></router-view>
   </div>
 </template>
 <script>
@@ -65,7 +67,7 @@ export default {
       let selectedSheetContent_ToLoad = {
         doctorList: [],
         typeList: [],
-        workhourList:[],
+        workhourList: [],
         areaList: []
       };
 
@@ -81,8 +83,13 @@ export default {
         vm.selectedSheetYear = "";
         vm.selectedSheetMonth = "";
       }
-
       vm.selectedSheetContent = selectedSheetContent_ToLoad;
+    },
+    clearSelect() {
+      this.selectedSheetID = "";
+      this.selectedSheetYear = "";
+      this.selectedSheetMonth = "";
+      this.selectedSheetContent = {};
     }
   }
 };

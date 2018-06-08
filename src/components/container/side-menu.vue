@@ -76,4 +76,7 @@ export default {
   background-color: rgb(238, 162, 118);
   height: 100%;
 }
+a {
+    color: blue;
+}
 </style>

@@ -25,4 +25,14 @@ export default {
         return state.typeTable.filter(type =>
             state.currentUser.arrange_section.indexOf(type.section) >= 0)
     },
+    getWorkhourByUserSection: state => {
+        return state.workhourTable.filter(workhour =>
+            state.currentUser.arrange_section.indexOf(workhour.section) >= 0)
+    },
+    getCalenderByYearMonth: state => (year, month) => {
+        return state.calenderTable.filter(x => {
+            let date = new Date(x.date);
+            return date.getFullYear() == year && (date.getMonth() + 1) == month
+        })
+    }
 }

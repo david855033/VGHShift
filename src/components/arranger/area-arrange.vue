@@ -29,11 +29,37 @@
                 </tr>
             </tbody>
         </table>
+        <h5>本班表所使用上班日工時</h5>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>workhour_id</th>
+                    <th>section</th>
+                    <th>description</th>
+                    <th>start_work</th>
+                    <th>end_work</th>
+                    <th>nap</th>
+                    <th>pm_off</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(e,i) in sheetContent.workhourList" :key="i">
+                    <td>{{e.workhour_id}}</td>
+                    <td>{{e.section}}</td>
+                    <td>{{e.description}}</td>
+                    <td>{{e.start_work}}</td>
+                    <td>{{e.end_work}}</td>
+                    <td>{{e.nap}}</td>
+                    <td>{{e.pm_off}}</td>
+                </tr>
+            </tbody>
+        </table>
         <h5>值班區域</h5>
         <table class="table table-sm">
             <thead>
                 <tr>
                     <th>type_id</th>
+                    <th>workhour_id</th>
                     <th>description</th>
                     <th>available_grades</th>
                 </tr>
@@ -41,6 +67,7 @@
             <tbody>
                 <tr v-for="(e,i) in sheetContent.areaList" :key="i">
                     <td>{{e.type_id}}</td>
+                    <td>{{e.workhour_id}}</td>
                     <td>{{e.description}}</td>
                     <td>{{e.available_grades}}</td>
                 </tr>
@@ -62,11 +89,12 @@ export default {
       let vm = this;
       let sheetContent = vm.sheetContent;
       if (!sheetContent.areaList) return;
-      sheetContent.areaList.push({
+      let newArea = {
         type_id: e.type_id,
         description: "__description__",
         available_grades: ["R1", "R2", "R3"]
-      });
+      };
+      sheetContent.areaList.push(newArea);
     }
   }
 };
