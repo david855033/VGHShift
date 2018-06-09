@@ -1,7 +1,7 @@
 <template>
     <div>
         <h4>Sheet Manage</h4>
-        <table class="table">
+        <table class="table table-sm">
             <thead>
                 <tr>
                     <th>sheet_id</th>

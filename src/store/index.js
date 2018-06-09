@@ -5,21 +5,41 @@ import action from './action'
 import getters from './getters'
 Vue.use(Vuex)
 
+//---test code for data stab--//
+let createDoctorTable = function (parameter) {
+    let doctor_id = 0;
+    let result = [];
+    for (var key in parameter) {
+        for (var i = 0; i < parameter[key]; i++) {
+            result.push(
+                {
+                    doctor_id: 'D' + doctor_id, id: 'F123456789', name: "醫(" + key + ")" + i,
+                    grade: key, section: 'PED', phs: '0000', code: 'DOC0000A'
+                })
+            doctor_id++
+        }
+    }
+    return result;
+}
+
 export default new Vuex.Store({
     state: {
         currentUser: {
             user_id: "U01", arrange_section: ["PED"]
         },
-        doctorTable: [
-            { doctor_id: 'D01', id: 'F123456789', name: "王大明", grade: "R2", section: 'PED', phs: '3999', code: 'DOC3999A' },
-            { doctor_id: 'D02', id: 'A123456789', name: "張國強", grade: "R2", section: 'PED', phs: '3987', code: 'DOC3987B' },
-            { doctor_id: 'D03', id: 'Z123456789', name: "李小華", grade: "V", section: 'SURG', phs: '2345', code: 'DOC2456A' }
-        ],
+        doctorTable: createDoctorTable({ V: 5, CR: 5, R3: 5, R2: 5, R1: 5, PGY: 10 }),
+        //  [
+        //     { doctor_id: 'D01', id: 'F123456789', name: "王大明", grade: "V", section: 'PED', phs: '3999', code: 'DOC3999A' },
+        //     { doctor_id: 'D02', id: 'A123456789', name: "張國強", grade: "R2", section: 'PED', phs: '3987', code: 'DOC3987B' },
+        //     { doctor_id: 'D03', id: 'Z123456789', name: "李小華", grade: "V", section: 'SURG', phs: '2345', code: 'DOC2456A' }
+        // ],
         typeTable: [
-            { type_id: 'T01', section: 'PED', description: '住院醫師班', work_to_work: "1630-0730", work_to_holiday: "1630-0800", holiday_to_work: "0800-0730", holiday_to_holiday: "0800-0800" }
+            { type_id: 'T01', section: 'PED', description: '住院醫師班', work_to_work: "1630-0730", work_to_holiday: "1630-0800", holiday_to_work: "0800-0730", holiday_to_holiday: "0800-0800" },
+            { type_id: 'T02', section: 'PED', description: '急診夜班', work_to_work: "1930-0730", work_to_holiday: "1930-0730", holiday_to_work: "1930-0730", holiday_to_holiday: "1930-0730" },
+            { type_id: 'T03', section: 'PED', description: '急診白斑', work_to_work: "0730-1730", work_to_holiday: "0730-1730", holiday_to_work: "0730-1730", holiday_to_holiday: "0730-1730" }
         ],
         workhourTable: [
-            { workhour_id: 'W01', section: 'PED', description: '住院醫師上班日', start_work: '0730', end_work: '16:30', nap: '30', pm_off: '12:00'}
+            { workhour_id: 'W01', section: 'PED', description: '住院醫師上班日', start_work: '0730', end_work: '16:30', nap: '30', pm_off: '12:00' }
         ],
         calenderTable: [
             { date: '2018-07-01', weekday: "0", is_holiday: true, description: "" },
@@ -60,7 +80,7 @@ export default new Vuex.Store({
         ],
         bookDate: [
             {
-                doctor_id: 'D01', year: 2018, month: 7,
+                doctor_id: 'D1', year: 2018, month: 7,
                 book_dates: JSON.stringify([
                     { date: 1, expect: "n", description: "lazy" },
                     { date: 2, expect: "n", description: "lazy" },

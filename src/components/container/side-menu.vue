@@ -17,6 +17,9 @@
                 <li>
                     <router-link to="/type-list-manage">type list</router-link>
                 </li>
+                 <li>
+                    <router-link to="/workhour-list-manage">workhour list</router-link>
+                </li>
                 <li>
                     <router-link to="/calender-manage">calender</router-link>
                 </li>

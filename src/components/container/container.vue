@@ -28,7 +28,7 @@ export default {
   flex-direction: row
 }
 #left-col {
-  flex: 0 0 240px;
+  flex: 0 0 200px;
 }
 #right-col{
   flex: 1 1 auto;

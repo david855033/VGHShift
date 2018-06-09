@@ -60,6 +60,7 @@
                 <tr>
                     <th>type_id</th>
                     <th>workhour_id</th>
+                    <th>area_abbr</th>
                     <th>description</th>
                     <th>available_grades</th>
                 </tr>
@@ -67,9 +68,14 @@
             <tbody>
                 <tr v-for="(e,i) in sheetContent.areaList" :key="i">
                     <td>{{e.type_id}}</td>
-                    <td>{{e.workhour_id}}</td>
-                    <td>{{e.description}}</td>
-                    <td>{{e.available_grades}}</td>
+                    <td><input type="text" class="workhour-id" v-model="e.workhour_id"></td>
+                    <td><input type="text" class="area-abbr" v-model="e.area_abbr"></td>
+                    <td><input type="text" v-model="e.description"></td>
+                    <td>
+                        <div v-for="(grade, g) in JSON.parse(e.available_grades)" :key="g">
+                            {{grade}}
+                        </div>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -92,7 +98,7 @@ export default {
       let newArea = {
         type_id: e.type_id,
         description: "__description__",
-        available_grades: ["R1", "R2", "R3"]
+        available_grades: JSON.stringify(["R1", "R2", "R3"])
       };
       sheetContent.areaList.push(newArea);
     }
@@ -103,6 +109,14 @@ export default {
 <style lang="scss" scoped>
 h5 {
   margin-top: 10px;
+}
+input.workhour-id {
+  width: 100px;
+  text-align: center;
+}
+input.area-abbr {
+  width: 60px;
+  text-align: center;
 }
 </style>
 

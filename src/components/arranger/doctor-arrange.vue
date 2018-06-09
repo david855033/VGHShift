@@ -9,7 +9,9 @@
                     <th>grade</th>
                     <th>section</th>
                     <th>code</th>
-                    <th></th>
+                    <th>
+                        <button class="btn btn-sm py-0" @click="addAllFromDoctorList()">全部加入</button>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -32,6 +34,9 @@
             <thead>
                 <tr>
                     <th>doctor_id</th>
+                    <th>doctor_abbr
+                        <button type="button" class="btn btn-small ml-1 p-0" @click="auto_abbr">自動</button>
+                    </th>
                     <th>section</th>
                     <th>grade</th>
                     <th>name</th>
@@ -43,6 +48,7 @@
             <tbody>
                 <tr v-for="(e,i) in sheetContent.doctorList" :key="i">
                     <td>{{e.doctor_id}}</td>
+                    <td><input type="text" v-model="e.doctor_abbr"></td>
                     <td>{{e.section}}</td>
                     <td>{{e.grade}}</td>
                     <td>{{e.name}}</td>
@@ -63,7 +69,7 @@ import { mapGetters } from "vuex";
 import util from "@/components/my-util";
 
 export default {
-  props: ["sheetContent","sheetYear","sheetMonth"],
+  props: ["sheetContent", "sheetYear", "sheetMonth"],
   data() {
     return {};
   },
@@ -77,7 +83,7 @@ export default {
     addFromDoctorList(e) {
       let vm = this;
       let sheetContent = vm.sheetContent;
-       if(!sheetContent.doctorList) return;
+      if (!sheetContent.doctorList) return;
       let isAlreadyInList = util.inArray(
         sheetContent.doctorList,
         x => x.doctor_id == e.doctor_id
@@ -87,6 +93,25 @@ export default {
         util.fill_DoctorArrange(e, vm);
         sheetContent.doctorList.push(e);
       }
+    },
+    addAllFromDoctorList() {
+      let vm = this;
+      vm.doctorByUserSection.forEach(e => {
+        vm.addFromDoctorList(e);
+      });
+    },
+    auto_abbr() {
+      let vm = this;
+      let sheetContent = vm.sheetContent;
+      if (!sheetContent.doctorList) return;
+      let default_abbr = util.default_abbr();
+      let position = 0;
+      vm.sheetContent.doctorList.forEach(doctor => {
+        if (position < default_abbr.length) {
+          doctor.doctor_abbr = default_abbr[position];
+          position++;
+        }
+      });
     },
     fetchBookDate() {
       let vm = this;
@@ -107,6 +132,14 @@ export default {
 <style lang="scss" scoped>
 h5 {
   margin-top: 10px;
+}
+input[type="text"] {
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
 }
 </style>
 

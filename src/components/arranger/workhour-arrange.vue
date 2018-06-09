@@ -11,7 +11,9 @@
                     <th>end_work</th>
                     <th>nap</th>
                     <th>pm_off</th>
-                    <th></th>
+                    <th>
+                        <button class="btn btn-sm py-0" @click="addAllFromWorkhourList()">全部加入</button>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -87,9 +89,20 @@ export default {
         util.fill_WorkhourArrange(e, vm);
         sheetContent.workhourList.push(e);
       }
+    },
+    addAllFromWorkhourList() {
+      let vm = this;
+      vm.workhourByUserSection.forEach(e => {
+        vm.addFromWorkhourList(e);
+      });
     }
   }
 };
 </script>
 
+<style lang="scss" scoped>
+h5 {
+  margin-top: 10px;
+}
+</style>
 

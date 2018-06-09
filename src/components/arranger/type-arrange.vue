@@ -11,7 +11,9 @@
                     <th>平假</th>
                     <th>假平</th>
                     <th>假假</th>
-                    <th>功能</th>
+                    <th>
+                        <button class="btn btn-sm py-0" @click="addAllFromTypeList()">全部加入</button>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -52,7 +54,6 @@
                     <td>{{e.work_to_holiday}}</td>
                     <td>{{e.holiday_to_work}}</td>
                     <td>{{e.holiday_to_holiday}}</td>
-
                 </tr>
             </tbody>
         </table>
@@ -89,6 +90,12 @@ export default {
         util.fill_TypeArrange(e, vm);
         sheetContent.typeList.push(e);
       }
+    },
+    addAllFromTypeList() {
+      let vm = this;
+      vm.typeByUserSection.forEach(e => {
+        vm.addFromTypeList(e);
+      });
     }
   }
 };

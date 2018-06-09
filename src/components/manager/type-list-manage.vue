@@ -1,7 +1,7 @@
 <template>
     <div>
         <h4>Type List Manage</h4>
-        <table class="table">
+        <table class="table table-sm">
             <thead>
                 <tr>
                     <th>type_id</th>

@@ -6,6 +6,7 @@ import MainPage from '@/components/container/main-page'
 
 import DoctorListManage from '@/components/manager/doctor-list-manage'
 import TypeListManage from '@/components/manager/type-list-manage'
+import WorkhourListManage from '@/components/manager/workhour-list-manage'
 import CalenderManage from '@/components/manager/calender-manage'
 import SheetManage from '@/components/manager/sheet-manage'
 
@@ -42,6 +43,11 @@ export default new Router({
           path: '/type-list-manage',
           name: 'TypeListManage',
           component: TypeListManage,
+        },
+        {
+          path: '/workhour-list-manage',
+          name: 'WorkhourListManage',
+          component: WorkhourListManage,
         },
         {
           path: '/calender-manage',
