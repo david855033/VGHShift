@@ -13,33 +13,35 @@
           <tr>
             <td colspan="2">以區排人</td>
             <td :colspan="calenderByYearMonth(sheetYear,sheetMonth).length">
+              過濾器：
               <div class="form-check form-check-inline" v-for="(e, i) in distinctAreaAbbr" :key="i">
                 <input class="form-check-input" tabindex="-1" type="checkbox" :id="'inlineCheckboxArea'+i" :value="e" v-model="checkedArea">
                 <label class="form-check-label" :for="'inlineCheckboxArea'+i">{{e}}</label>
               </div>
             </td>
           </tr>
-          <tr v-for="(area,y) in sheetContent.areaList.filter(x=>checkedArea.indexOf(x.area_abbr)>=0)" :key="y">
-            <td>{{area.description}}</td>
-            <td>{{area.area_abbr}}</td>
+          <tr v-for="(area,y) in selectedArea" :key="y">
+            <td class="col-description">{{area.description}}</td>
+            <td class="col-abbr">{{area.area_abbr}}</td>
             <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y)">
-              <input type="text" v-show="true" :x="x" :y="y" @keydown.up="onUp" @keydown.down="onDown" @keydown.enter="onDown" @keydown.left="onLeft" @keydown.right="onRight" @focus="focus(x, y)">
+              <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e)" @focus="focus(x, y)">
             </td>
           </tr>
           <tr>
             <td :colspan="2">以人排區</td>
             <td :colspan="calenderByYearMonth(sheetYear,sheetMonth).length">
+              過濾器：
               <div class="form-check form-check-inline" v-for="(e, i) in distrinctDoctorGrade" :key="i">
                 <input class="form-check-input" tabindex="-1" type="checkbox" :id="'inlineCheckboxGrade'+i" :value="e" v-model="checkedDoctor">
                 <label class="form-check-label" :for="'inlineCheckboxGrade'+i">{{e}}</label>
               </div>
             </td>
           </tr>
-          <tr v-for="(doctor,y) in sheetContent.doctorList.filter(x=>checkedDoctor.indexOf( x.grade)>=0)" :key="y+areaListlength">
-            <td>{{doctor.name}}</td>
-            <td>{{doctor.doctor_abbr}}</td>
-            <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y+areaListlength)">
-              <input type="text" v-show="true" :x="x" :y="y+areaListlength" @keydown.up="onUp" @keydown.down="onDown" @keydown.enter="onDown" @keydown.left="onLeft" @keydown.right="onRight" @focus="focus(x, y+areaListlength)">
+          <tr v-for="(doctor,y) in selectedDoctor" :key="y+selectedArea.length">
+            <td class="col-description">{{doctor.name}}</td>
+            <td class="col-abbr">{{doctor.doctor_abbr}}</td>
+            <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y+selectedArea.length)">
+              <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" @keydown.prevent="onAnyKey($event, e)" @focus="focus(x, y+selectedArea.length)">
             </td>
           </tr>
         </tbody>
@@ -59,17 +61,25 @@ export default {
     ...mapGetters({
       calenderByYearMonth: "getCalenderByYearMonth"
     }),
-    areaListlength() {
+    selectedArea() {
       let vm = this;
-      return this.sheetContent.areaList.filter(
-        x => vm.checkedArea.indexOf(x.area_abbr) >= 0
-      ).length;
+      if (vm.checkedArea.length == 0) {
+        return vm.sheetContent.areaList;
+      } else {
+        return vm.sheetContent.areaList.filter(
+          x => vm.checkedArea.indexOf(x.area_abbr) >= 0
+        );
+      }
     },
-    doctorListlength() {
+    selectedDoctor() {
       let vm = this;
-      return this.sheetContent.doctorList.filter(
-        x => vm.checkedDoctor.indexOf(x.grade) >= 0
-      ).length;
+      if (vm.checkedDoctor.length == 0) {
+        return vm.sheetContent.doctorList;
+      } else {
+        return vm.sheetContent.doctorList.filter(
+          x => vm.checkedDoctor.indexOf(x.grade) >= 0
+        );
+      }
     },
     distinctAreaAbbr() {
       let vm = this;
@@ -98,33 +108,73 @@ export default {
     focus(x, y) {
       this.focus_x = x;
       this.focus_y = y;
+      let focus_input = $(
+        "input[x = " + this.focus_x + "][y = " + this.focus_y + "]"
+      );
+      focus_input.select();
     },
-    refocus() {
-      $("input[x = " + this.focus_x + "][y = " + this.focus_y + "]").focus();
+    resetfocus() {
+      let focus_input = $(
+        "input[x = " + this.focus_x + "][y = " + this.focus_y + "]"
+      );
+      focus_input.focus();
+    },
+    onAnyKey(e, element) {
+      let vm = this;
+      if (!e.shiftKey) {
+        if (e.code == "Enter" || e.code == "ArrowDown") {
+          vm.onDown();
+        } else if (e.code == "ArrowUp") {
+          vm.onUp();
+        } else if (e.code == "ArrowLeft") {
+          vm.onLeft();
+        } else if (e.code == "Backspace" || e.code == "Delete") {
+          e.path[0].value = "";
+          vm.onLeft();
+        } else if (e.code == "ArrowRight" || e.code == "Tab") {
+          vm.onRight();
+        }
+      }
+      if (e.key.length == 1) {
+        let charCode = e.key.charCodeAt(0);
+        if (
+          (charCode >= 65 && charCode <= 90) ||
+          (charCode >= 97 && e.keyCode <= 122) ||
+          (charCode >= 48 && e.keyCode <= 57)
+        ) {
+          
+          e.path[0].value = String.fromCharCode(charCode);// TODO: make a function to recieve duty arrange.
+          vm.onRight();
+        }
+      }
     },
     onUp() {
       this.focus_y > 0 && (this.focus_y -= 1);
-      this.refocus();
+      this.resetfocus();
     },
     onDown() {
-      this.focus_y < this.doctorListlength + this.areaListlength - 1 &&
+      this.focus_y <
+        this.selectedDoctor.length + this.selectedArea.length - 1 &&
         (this.focus_y += 1);
-      this.refocus();
+      this.resetfocus();
     },
     onLeft() {
       this.focus_x > 0 && (this.focus_x -= 1);
-      this.refocus();
+      this.resetfocus();
     },
     onRight() {
       this.focus_x <
         this.calenderByYearMonth(this.sheetYear, this.sheetMonth).length - 1 &&
         (this.focus_x += 1);
-      this.refocus();
+      this.resetfocus();
     }
   }
 };
 </script>
 <style scoped>
+.table {
+  margin: auto;
+}
 h5 {
   margin-top: 10px;
 }
@@ -135,6 +185,14 @@ th {
   white-space: nowrap;
 }
 th {
+  text-align: center;
+}
+table {
+  max-width: 1000px;
+}
+td.col-abbr {
+  width: 40px;
+  background: whitesmoke;
   text-align: center;
 }
 td.cell {
