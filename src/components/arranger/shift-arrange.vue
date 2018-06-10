@@ -24,7 +24,7 @@
             <td class="col-description">{{area.description}}</td>
             <td class="col-abbr">{{area.area_abbr}}</td>
             <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y)">
-              <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="area.arranged_duty">
+              <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="((areaMatrix[y]||[])[x]||{}).doctor_abbr">
             </td>
           </tr>
           <tr>
@@ -55,7 +55,13 @@ import { mapGetters } from "vuex";
 export default {
   props: ["sheetContent", "sheetYear", "sheetMonth"],
   data() {
-    return { focus_y: "", focus_x: "", checkedArea: [], checkedDoctor: [] };
+    return {
+      focus_y: "",
+      focus_x: "",
+      checkedArea: [],
+      checkedDoctor: [],
+      areaMatrix: []
+    };
   },
   computed: {
     ...mapGetters({
@@ -144,25 +150,44 @@ export default {
           (charCode >= 97 && e.keyCode <= 122) ||
           (charCode >= 48 && e.keyCode <= 57)
         ) {
-          let value = String.fromCharCode(charCode); // TODO: make a function to recieve duty arrange.
+          let value = String.fromCharCode(charCode);
           let date = new Date(dateElement.date).getDate();
           if (updateType == "doctor") {
             let doctor_id = rowElement.doctor_id;
             let matchArea = areaList.filter(x => x.area_abbr == value);
-            matchArea.forEach(x => {
-              let arranged_duty_array = JSON.parse(x.arranged_duty);
-              arranged_duty_array[date] = doctor_id;
-              x.arranged_duty = JSON.stringify(arranged_duty_array);
-            });
-            console.log(
-              "update:" + updateType + ", value:" + value + ", date:" + date,
-              ", doctor_id:" + doctor_id
+            matchArea.forEach(x =>
+              vm.updateAreaArrangedDuty(x, date, doctor_id)
             );
+          } else if (updateType == "area") {
+            //todo
           }
 
           vm.onRight();
         }
       }
+    },
+    updateAreaArrangedDuty(area, date, doctor_id) {
+      let vm = this;
+      let doctorList = vm.sheetContent.doctorList;
+      let areaList = vm.sheetContent.areaList;
+      let selectedArea = vm.selectedArea;
+      let areaMatrix = vm.areaMatrix;
+      let y = selectedArea.findIndex(x => {
+        return x.area_abbr == area.area_abbr;
+      });
+      if (y < 0) {
+        return;
+      }
+      let x = date - 1;
+      if (!Array.isArray(areaMatrix[y])) {
+        vm.$set(areaMatrix, y, []);
+      }
+      if (!Array.isArray(areaMatrix[y][x])) {
+        vm.$set(areaMatrix[y], x, []);
+      }
+      areaMatrix[y][x] = { doctor_abbr: doctor_id };
+      //todo: update doctorMatrix
+      //todo: update areaList
     },
     onUp() {
       this.focus_y > 0 && (this.focus_y -= 1);
@@ -184,6 +209,10 @@ export default {
         (this.focus_x += 1);
       this.resetfocus();
     }
+  },
+  mounted() {
+    console.log("mounted");
+    //todo refresh page
   }
 };
 </script>
