@@ -100,6 +100,7 @@ export default {
         description: "__description__",
         available_grades: JSON.stringify(["R1", "R2", "R3"])
       };
+      util.fill_AreaArrange(newArea,vm);
       sheetContent.areaList.push(newArea);
     }
   }

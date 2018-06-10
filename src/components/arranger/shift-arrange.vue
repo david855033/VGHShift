@@ -24,7 +24,7 @@
             <td class="col-description">{{area.description}}</td>
             <td class="col-abbr">{{area.area_abbr}}</td>
             <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y)">
-              <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="getArrangedDutyInArea(area, e)">
+              <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="area.arranged_duty">
             </td>
           </tr>
           <tr>
@@ -105,12 +105,6 @@ export default {
     }
   },
   methods: {
-     getArrangedDutyInArea(area, date) {
-      // let vm = this;
-      // let doctorList = vm.sheetContent.doctorList;
-      // let areaList = vm.sheetContent.areaList;
-      return 1;
-    },
     focus(x, y) {
       this.focus_x = x;
       this.focus_y = y;
@@ -127,6 +121,8 @@ export default {
     },
     onAnyKey(e, dateElement, updateType, rowElement) {
       let vm = this;
+      let doctorList = vm.sheetContent.doctorList;
+      let areaList = vm.sheetContent.areaList;
       if (!e.shiftKey && !e.ctrlKey) {
         if (e.code == "ArrowDown") {
           vm.onDown();
@@ -152,6 +148,12 @@ export default {
           let date = new Date(dateElement.date).getDate();
           if (updateType == "doctor") {
             let doctor_id = rowElement.doctor_id;
+            let matchArea = areaList.filter(x => x.area_abbr == value);
+            matchArea.forEach(x => {
+              let arranged_duty_array = JSON.parse(x.arranged_duty);
+              arranged_duty_array[date] = doctor_id;
+              x.arranged_duty = JSON.stringify(arranged_duty_array);
+            });
             console.log(
               "update:" + updateType + ", value:" + value + ", date:" + date,
               ", doctor_id:" + doctor_id
