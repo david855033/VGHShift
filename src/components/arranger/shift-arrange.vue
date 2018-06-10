@@ -24,7 +24,7 @@
             <td class="col-description">{{area.description}}</td>
             <td class="col-abbr">{{area.area_abbr}}</td>
             <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y)">
-              <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e)" @focus="focus(x, y)">
+              <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="getArrangedDutyInArea(area, e)">
             </td>
           </tr>
           <tr>
@@ -41,7 +41,7 @@
             <td class="col-description">{{doctor.name}}</td>
             <td class="col-abbr">{{doctor.doctor_abbr}}</td>
             <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y+selectedArea.length)">
-              <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" @keydown.prevent="onAnyKey($event, e)" @focus="focus(x, y+selectedArea.length)">
+              <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" @keydown.prevent="onAnyKey($event,e,'doctor' ,doctor)" @focus="focus(x, y+selectedArea.length)">
             </td>
           </tr>
         </tbody>
@@ -105,6 +105,12 @@ export default {
     }
   },
   methods: {
+     getArrangedDutyInArea(area, date) {
+      // let vm = this;
+      // let doctorList = vm.sheetContent.doctorList;
+      // let areaList = vm.sheetContent.areaList;
+      return 1;
+    },
     focus(x, y) {
       this.focus_x = x;
       this.focus_y = y;
@@ -119,10 +125,10 @@ export default {
       );
       focus_input.focus();
     },
-    onAnyKey(e, element) {
+    onAnyKey(e, dateElement, updateType, rowElement) {
       let vm = this;
-      if (!e.shiftKey) {
-        if (e.code == "Enter" || e.code == "ArrowDown") {
+      if (!e.shiftKey && !e.ctrlKey) {
+        if (e.code == "ArrowDown") {
           vm.onDown();
         } else if (e.code == "ArrowUp") {
           vm.onUp();
@@ -135,15 +141,23 @@ export default {
           vm.onRight();
         }
       }
-      if (e.key.length == 1) {
+      if (e.key.length == 1 && !e.ctrlKey) {
         let charCode = e.key.charCodeAt(0);
         if (
           (charCode >= 65 && charCode <= 90) ||
           (charCode >= 97 && e.keyCode <= 122) ||
           (charCode >= 48 && e.keyCode <= 57)
         ) {
-          
-          e.path[0].value = String.fromCharCode(charCode);// TODO: make a function to recieve duty arrange.
+          let value = String.fromCharCode(charCode); // TODO: make a function to recieve duty arrange.
+          let date = new Date(dateElement.date).getDate();
+          if (updateType == "doctor") {
+            let doctor_id = rowElement.doctor_id;
+            console.log(
+              "update:" + updateType + ", value:" + value + ", date:" + date,
+              ", doctor_id:" + doctor_id
+            );
+          }
+
           vm.onRight();
         }
       }
