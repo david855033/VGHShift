@@ -137,6 +137,7 @@ export default {
       let doctorMatrix = vm.doctorMatrix;
       let areaList = vm.sheetContent.areaList;
       let selectedArea = vm.selectedArea;
+      let areaMatrix = vm.areaMatrix;
 
       let charCode = e.key.charCodeAt(0);
       let value = String.fromCharCode(charCode);
@@ -152,7 +153,7 @@ export default {
         } else if (e.code == "Backspace" || e.code == "Delete") {
           //TODO DELETE DUTY
           if (updateType == "doctor") {
-            //change in doctor cell
+            //delete in doctor cell
             let doctor = rowElement;
             let y = selectedDoctor.findIndex(
               x => x.doctor_abbr == doctor.doctor_abbr
@@ -164,7 +165,17 @@ export default {
               vm.arrange_AreaList(area, date, doctor, true);
             });
           } else if (updateType == "area") {
-            //todo: change in area cell
+            //todo: delete in area cell
+            let area = rowElement;
+            let y = selectedArea.findIndex(x => x.area_abbr == area.area_abbr);
+            let doctor_abbr = areaMatrix[y][date - 1].doctor_abbr;
+            let matchDoctor = doctorList.filter(
+              x => x.doctor_abbr == doctor_abbr
+            );
+            matchDoctor.forEach(doctor => {
+              vm.arrange_ViewMatrix(area, date, doctor, true);
+              vm.arrange_AreaList(area, date, doctor, true);
+            });
           }
           if (e.code == "Backspace") {
             vm.onLeft();
@@ -193,6 +204,15 @@ export default {
             });
           } else if (updateType == "area") {
             //todo: change in area cell
+            let area = rowElement;
+            let matchDoctor = selectedDoctor.filter(
+              x => x.doctor_abbr == value
+            );
+            matchDoctor.forEach(doctor => {
+              vm.arrange_ViewMatrix(area, date, doctor);
+              vm.arrange_AreaList(area, date, doctor);
+              updated = true;
+            });
           }
 
           updated && vm.onRight();
