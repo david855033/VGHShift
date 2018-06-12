@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h5>排班區</h5>
+    <h5>排班區 Assigning Area:{{assignArea.area_abbr}}, Assigning Doctor:{{assignDoctor.doctor_abbr}}</h5>
     <div id="table-container" class="mr-3">
       <table class="table table-sm">
         <thead>
@@ -21,10 +21,10 @@
             </td>
           </tr>
           <tr v-for="(area,y) in selectedArea" :key="y">
-            <td class="col-description">{{area.description}}</td>
-            <td class="col-abbr">{{area.area_abbr}}</td>
+            <td class="col-description" @click="setAssignArea(area)">{{area.description}}</td>
+            <td class="col-abbr" @click="setAssignArea(area)">{{area.area_abbr}}</td>
             <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y)">
-              <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="((areaMatrix[y]||[])[x]||{}).doctor_abbr">
+              <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="((areaMatrix[y]||[])[x]||{}).doctor_abbr" @input="onAreaInput($event,y,x)">
             </td>
           </tr>
           <tr>
@@ -38,8 +38,8 @@
             </td>
           </tr>
           <tr v-for="(doctor,y) in selectedDoctor" :key="y+selectedArea.length">
-            <td class="col-description">{{doctor.name}}</td>
-            <td class="col-abbr">{{doctor.doctor_abbr}}</td>
+            <td class="col-description" @click="setAssignDoctor(doctor)">{{doctor.name}}</td>
+            <td class="col-abbr" @click="setAssignDoctor(doctor)">{{doctor.doctor_abbr}}</td>
             <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y+selectedArea.length)">
               <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" @keydown.prevent="onAnyKey($event,e,'doctor' ,doctor)" @focus="focus(x, y+selectedArea.length)" :value="((doctorMatrix[y]||[])[x]||{}).area_abbr" @input="onDoctorInput($event,y,x)">
             </td>
@@ -61,7 +61,9 @@ export default {
       checkedArea: [],
       checkedDoctor: [],
       areaMatrix: [],
-      doctorMatrix: []
+      doctorMatrix: [],
+      assignArea: {},
+      assignDoctor: {}
     };
   },
   computed: {
@@ -120,13 +122,27 @@ export default {
       );
       focus_input.select();
     },
+    setAssignArea(area) {
+      this.assignDoctor = {};
+      this.assignArea = this.assignArea == area ? {} : area;
+    },
+    setAssignDoctor(doctor) {
+      this.assignArea = {};
+      this.assignDoctor = this.assignDoctor == doctor ? {} : doctor;
+    },
     resetfocus() {
       let focus_input = $(
         "input[x = " + this.focus_x + "][y = " + this.focus_y + "]"
       );
       focus_input.focus();
     },
+    onAreaInput(e, y, x) {
+      //to disable invalid key input action
+      let areaMatrix = this.areaMatrix;
+      e.target.value = ((areaMatrix[y] || [])[x] || {}).doctor_abbr;
+    },
     onDoctorInput(e, y, x) {
+      //to disable invalid key input action
       let doctorMatrix = this.doctorMatrix;
       e.target.value = ((doctorMatrix[y] || [])[x] || {}).area_abbr;
     },
@@ -197,17 +213,20 @@ export default {
             //change in doctor cell
             let doctor = rowElement;
             let matchArea = selectedArea.filter(x => x.area_abbr == value);
+            //update view and areaList
             matchArea.forEach(area => {
               vm.arrange_ViewMatrix(area, date, doctor);
               vm.arrange_AreaList(area, date, doctor);
               updated = true;
             });
           } else if (updateType == "area") {
-            //todo: change in area cell
+            //change in area cell
             let area = rowElement;
             let matchDoctor = selectedDoctor.filter(
               x => x.doctor_abbr == value
             );
+
+            //update view and areaList
             matchDoctor.forEach(doctor => {
               vm.arrange_ViewMatrix(area, date, doctor);
               vm.arrange_AreaList(area, date, doctor);
@@ -218,6 +237,9 @@ export default {
           updated && vm.onRight();
         }
       }
+      if (e.shiftKey && e.code == "Tab") {
+        vm.onLeft();
+      }
     },
     arrange_ViewMatrix(area, date, doctor, clear) {
       let vm = this;
@@ -226,7 +248,7 @@ export default {
       let areaMatrix = vm.areaMatrix;
       let selectedDoctor = vm.selectedDoctor;
       let doctorMatrix = vm.doctorMatrix;
-
+      let doctorList = vm.sheetContent.doctorList;
       let x = date - 1;
       let y_area = selectedArea.findIndex(x => {
         return x.area_abbr == area.area_abbr;
@@ -234,6 +256,22 @@ export default {
       let y_doctor = selectedDoctor.findIndex(x => {
         return x.doctor_abbr == doctor.doctor_abbr;
       });
+      if (!clear) {
+        //remove same doctor in areaMatrix and areaList
+        areaMatrix.forEach((row, dupli_y) => {
+          if (row[x].doctor_abbr == doctor.doctor_abbr) {
+            row[x].doctor_abbr = "";
+            let dupli_area = selectedArea[dupli_y];
+            vm.arrange_AreaList(dupli_area, date, doctor, true);
+          }
+        });
+        //remove same area in doctorMatraix
+        doctorMatrix.forEach(row => {
+          if (row[x].area_abbr == area.area_abbr) {
+            row[x].area_abbr = "";
+          }
+        });
+      }
       //rendering matched cell in areaMatrix
       areaMatrix[y_area][x].doctor_abbr = clear ? "" : doctor.doctor_abbr;
       //rendering matched cell in doctorMatrix
@@ -247,12 +285,18 @@ export default {
     },
     renderAreaMatrix() {
       let vm = this;
+      let doctorList = vm.sheetContent.doctorList;
       let selectedArea = vm.selectedArea;
       let areaMatrix = vm.areaMatrix;
-      selectedArea.forEach((e, y) => {
+      selectedArea.forEach((area, y) => {
         vm.$set(areaMatrix, y, []);
+        let arranged_duty_array = JSON.parse(area.arranged_duty) || [];
         vm.calenderByYearMonth(vm.sheetYear, vm.sheetMonth).forEach((d, x) => {
-          vm.$set(areaMatrix[y], x, { doctor_abbr: "" });
+          let doctor_id = arranged_duty_array[x];
+          let doctor_abbr =
+            (doctorList.find(x => x.doctor_id == doctor_id) || {})
+              .doctor_abbr || "";
+          vm.$set(areaMatrix[y], x, { doctor_abbr: doctor_abbr }); //areaMatrix初始值
         });
       });
     },
@@ -260,10 +304,24 @@ export default {
       let vm = this;
       let selectedDoctor = vm.selectedDoctor;
       let doctorMatrix = vm.doctorMatrix;
-      selectedDoctor.forEach((e, y) => {
+      let areaList = vm.sheetContent.areaList;
+      selectedDoctor.forEach((doctor, y) => {
         vm.$set(doctorMatrix, y, []);
         vm.calenderByYearMonth(vm.sheetYear, vm.sheetMonth).forEach((d, x) => {
-          vm.$set(doctorMatrix[y], x, { area_abbr: "" });
+          vm.$set(doctorMatrix[y], x, { area_abbr: "" }); //doctorMatrix初始值
+        });
+      });
+      areaList.forEach(area => {
+        let arranged_duty_array = JSON.parse(area.arranged_duty) || [];
+        arranged_duty_array.forEach((doctor_id, x) => {
+          if (doctor_id) {
+            let y = selectedDoctor.findIndex(
+              doctor => doctor.doctor_id == doctor_id
+            );
+            if (y >= 0) {
+              doctorMatrix[y][x].area_abbr = area.area_abbr;
+            }
+          }
         });
       });
     },
@@ -343,5 +401,6 @@ input[type="text"] {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
+  cursor: pointer;
 }
 </style>
