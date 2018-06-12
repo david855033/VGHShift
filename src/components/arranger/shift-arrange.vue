@@ -233,7 +233,6 @@ export default {
               updated = true;
             });
           }
-
           updated && vm.onRight();
         }
       }
@@ -257,12 +256,10 @@ export default {
         return x.doctor_abbr == doctor.doctor_abbr;
       });
       if (!clear) {
-        //remove same doctor in areaMatrix and areaList
+        //remove same doctor in areaMatrix
         areaMatrix.forEach((row, dupli_y) => {
           if (row[x].doctor_abbr == doctor.doctor_abbr) {
             row[x].doctor_abbr = "";
-            let dupli_area = selectedArea[dupli_y];
-            vm.arrange_AreaList(dupli_area, date, doctor, true);
           }
         });
         //remove same area in doctorMatraix
@@ -278,7 +275,19 @@ export default {
       doctorMatrix[y_doctor][x].area_abbr = clear ? "" : area.area_abbr;
     },
     arrange_AreaList(area, date, doctor, clear) {
+      let areaList = this.sheetContent.areaList;
       let x = date - 1;
+      //remove duplicate
+      if (!clear) {
+        areaList.forEach(row => {
+          let current_arranged_duty_array = JSON.parse(row.arranged_duty);
+          if(current_arranged_duty_array[x] == doctor.doctor_id){
+            current_arranged_duty_array[x]="";
+          }
+          row.arranged_duty=JSON.stringify(current_arranged_duty_array);
+        });
+      }
+      //set new value
       let array = JSON.parse(area.arranged_duty);
       array[x] = clear ? "" : doctor.doctor_id;
       area.arranged_duty = JSON.stringify(array);
@@ -362,8 +371,8 @@ export default {
         this.renderDoctorMatrix();
       },
       deep: true
-    }
   }
+    }
 };
 </script>
 <style scoped>
