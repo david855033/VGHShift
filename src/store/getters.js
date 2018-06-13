@@ -1,14 +1,14 @@
 export default {
     getSheetByUserSection: state => {
         return state.sheetTable.filter(sheet =>
-            state.currentUser.arrange_section.indexOf(sheet.section) >= 0)
+            state.currentUser.section == sheet.section)
     },
     getSheetByID: state => sheet_id => {
         return state.sheetTable.find(sheet => sheet.sheet_id === sheet_id)
     },
     getDoctorByUserSection: state => {
         return state.doctorTable.filter(doctor =>
-            state.currentUser.arrange_section.indexOf(doctor.section) >= 0)
+            state.currentUser.section == doctor.section)
     },
     getBookDatesByDoctorYearMonth: state => (doctor_id, year, month) => {
         let findDoctorBookDate = state.bookDate.find(
@@ -23,11 +23,11 @@ export default {
     },
     getTypeByUserSection: state => {
         return state.typeTable.filter(type =>
-            state.currentUser.arrange_section.indexOf(type.section) >= 0)
+            state.currentUser.section == type.section)
     },
     getWorkhourByUserSection: state => {
         return state.workhourTable.filter(workhour =>
-            state.currentUser.arrange_section.indexOf(workhour.section) >= 0)
+            state.currentUser.section == workhour.section >= 0)
     },
     getCalenderByYearMonth: state => (year, month) => {
         return state.calenderTable.filter(x => {

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "bootstrap": "^4.1.1",
+    "lodash": "^4.17.10",
     "sass-loader": "^7.0.2",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"

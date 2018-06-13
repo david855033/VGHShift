@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import mutation from './mutation'
-import action from './action'
+import mutations from './mutations'
+import actions from './actions'
 import getters from './getters'
 Vue.use(Vuex)
 
@@ -24,8 +24,12 @@ let createDoctorTable = function (parameter) {
 
 export default new Vuex.Store({
     state: {
+        enviroment:{
+            new_sheet_year:2018,
+            new_sheet_month:7,
+        },
         currentUser: {
-            user_id: "U01", arrange_section: ["PED"]
+            user_id: "U01", section: "PED"
         },
         doctorTable: createDoctorTable({ V: 5, CR: 5, R3: 5, R2: 5, R1: 5, PGY: 10 }),
         //  [
@@ -89,6 +93,6 @@ export default new Vuex.Store({
         ]
     },
     getters,
-    mutation,
-    action
+    mutations,
+    actions
 })

@@ -25,10 +25,9 @@
             <td>{{sheet.version}}</td>
             <td>{{sheet.status}}</td>
             <td>
-              <button class="btn btn-sm btn-primary" @click.stop="onBranch(sheet)">branch</button>
-              <button class="btn btn-sm btn-primary" @click.stop>delete</button>
-              <button class="btn btn-sm btn-primary" @click.stop>publish</button>
-              <button class="btn btn-sm btn-primary" @click.stop>deny</button>
+              <button class="btn btn-sm btn-primary" @click.stop="onEdit(sheet)">edit</button>
+              <button class="btn btn-sm btn-primary" @click.stop="onPublish(sheet)">publish</button>
+              <button class="btn btn-sm btn-primary" @click.stop="onDeny(sheet)">deny</button>
             </td>
           </tr>
         </tbody>
@@ -55,7 +54,7 @@
   </div>
 </template>
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -71,9 +70,10 @@ export default {
     calenderByYearMonth: "getCalenderByYearMonth"
   }),
   methods: {
+    ...mapMutations(["addSheet"]),
     selectSheet(sheet_id) {
       let vm = this;
-      let selectedSheet = vm.getSheetByID("S01");
+      let selectedSheet = vm.getSheetByID(sheet_id); //從store中取出sheet
       //--初始化SheetContent--//
       let selectedSheetContent_ToLoad = {
         doctorList: [],
@@ -99,7 +99,7 @@ export default {
           selectedSheetContent_ToLoad = JSON.parse(selectedSheet.content);
         }
       } else {
-        //沒選擇表單:將selectedSheet清空
+        //沒選擇:將selectedSheet清空
         vm.selectedSheetID = "";
         vm.selectedSheetYear = "";
         vm.selectedSheetMonth = "";
@@ -112,12 +112,12 @@ export default {
       this.selectedSheetMonth = "";
       this.selectedSheetContent = {};
     },
-    onAddSheet(){
-      
+    onAddSheet() {
+      this.addSheet();
     },
-    onBranch(sheet){
-
-    }
+    onEdit(sheet) {},
+    onPublish(sheet) {},
+    onDeny(sheet) {}
   }
 };
 </script>
