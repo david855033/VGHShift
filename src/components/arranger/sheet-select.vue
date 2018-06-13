@@ -57,30 +57,19 @@ export default {
   },
   computed: mapGetters({
     sheetByUserSection: "getSheetByUserSection",
-    getSheetByID: "getSheetByID",
-    calenderByYearMonth: "getCalenderByYearMonth"
+    getSheetByID: "getSheetByID"
   }),
   methods: {
     selectSheet(sheet_id) {
       let vm = this;
       let selectedSheet = vm.getSheetByID("S01");
-
       //--初始化SheetContent--//
       let selectedSheetContent_ToLoad = {
         doctorList: [],
         typeList: [],
         workhourList: [],
-        calender: [],
         areaList: []
       };
-      let calender = vm.calenderByYearMonth(
-        selectedSheet.year,
-        selectedSheet.month
-      );
-      calender.forEach(element => {
-        selectedSheetContent_ToLoad.calender.push(element);
-      });
-      //初始化sheetContent結束
 
       if (selectedSheet) {
         vm.selectedSheetID = selectedSheet.sheet_id;
@@ -90,7 +79,6 @@ export default {
           selectedSheetContent_ToLoad = JSON.parse(selectedSheet.content);
         }
       } else {
-        //沒選擇表單:將selectedSheet清空
         vm.selectedSheetID = "";
         vm.selectedSheetYear = "";
         vm.selectedSheetMonth = "";
