@@ -11,7 +11,9 @@
             <th>section</th>
             <th>version</th>
             <th>status</th>
-            <th>功能</th>
+            <th>功能
+              <button class="btn btn-sm">add</button>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -22,7 +24,12 @@
             <td>{{e.section}}</td>
             <td>{{e.version}}</td>
             <td>{{e.status}}</td>
-            <td><button @click.stop>branch</button></td>
+            <td>
+              <button class="btn btn-sm" @click.stop>branch</button>
+              <button class="btn btn-sm" @click.stop>delete</button>
+              <button class="btn btn-sm" @click.stop>publish</button>
+              <button class="btn btn-sm" @click.stop>deny</button>
+            </td>
           </tr>
         </tbody>
       </table>
