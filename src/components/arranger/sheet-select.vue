@@ -11,6 +11,7 @@
             <th>section</th>
             <th>version</th>
             <th>status</th>
+            <th>功能</th>
           </tr>
         </thead>
         <tbody>
@@ -21,6 +22,7 @@
             <td>{{e.section}}</td>
             <td>{{e.version}}</td>
             <td>{{e.status}}</td>
+            <td><button @click.stop>branch</button></td>
           </tr>
         </tbody>
       </table>
@@ -38,6 +40,7 @@
         <router-link tag="button" :to="'/sheet-select/workhour-arrange'" type="button" class="btn btn-sm btn-primary">workhour-arrange</router-link>
         <router-link tag="button" :to="'/sheet-select/area-arrange'" type="button" class="btn btn-sm btn-primary">area-arrange</router-link>
         <router-link tag="button" :to="'/sheet-select/shift-arrange'" type="button" class="btn btn-sm btn-primary">shift-arrange</router-link>
+        <button type="button" class="btn btn-sm btn-primary">save</button>
         <router-link tag="button" :to="'/sheet-select'" type="button" class="btn btn-sm btn-primary" @click.native="clearSelect">go back</router-link>
       </div>
       <router-view id="manipulate" :sheet-content.sync="selectedSheetContent" :sheet-year.sync="selectedSheetYear" :sheet-month.sync="selectedSheetMonth"></router-view>

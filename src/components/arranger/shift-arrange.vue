@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h5>排班區 Assigning Area:{{assignArea.area_abbr}}, Assigning Doctor:{{assignDoctor.doctor_abbr}}</h5>
+    <h5>排班區</h5>
     <div id="table-container" class="mr-3">
       <table class="table table-sm">
         <thead>
@@ -96,7 +96,6 @@ export default {
       }
       return output;
     },
-
     distrinctDoctorGrade() {
       let vm = this;
       let doctorList = vm.sheetContent.doctorList;
