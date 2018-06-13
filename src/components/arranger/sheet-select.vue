@@ -12,23 +12,23 @@
             <th>version</th>
             <th>status</th>
             <th>功能
-              <button class="btn btn-sm">add</button>
+              <button class="btn btn-sm btn-primary" @click="onAddSheet">add blank sheet</button>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(e,i) in sheetByUserSection" :key="i" @click="selectSheet(e.sheet_id)">
-            <td>{{e.sheet_id}}</td>
-            <td>{{e.year}}</td>
-            <td>{{e.month}}</td>
-            <td>{{e.section}}</td>
-            <td>{{e.version}}</td>
-            <td>{{e.status}}</td>
+          <tr v-for="(sheet,i) in sheetByUserSection" :key="i" @click="selectSheet(sheet.sheet_id)">
+            <td>{{sheet.sheet_id}}</td>
+            <td>{{sheet.year}}</td>
+            <td>{{sheet.month}}</td>
+            <td>{{sheet.section}}</td>
+            <td>{{sheet.version}}</td>
+            <td>{{sheet.status}}</td>
             <td>
-              <button class="btn btn-sm" @click.stop>branch</button>
-              <button class="btn btn-sm" @click.stop>delete</button>
-              <button class="btn btn-sm" @click.stop>publish</button>
-              <button class="btn btn-sm" @click.stop>deny</button>
+              <button class="btn btn-sm btn-primary" @click.stop="onBranch(sheet)">branch</button>
+              <button class="btn btn-sm btn-primary" @click.stop>delete</button>
+              <button class="btn btn-sm btn-primary" @click.stop>publish</button>
+              <button class="btn btn-sm btn-primary" @click.stop>deny</button>
             </td>
           </tr>
         </tbody>
@@ -74,7 +74,6 @@ export default {
     selectSheet(sheet_id) {
       let vm = this;
       let selectedSheet = vm.getSheetByID("S01");
-
       //--初始化SheetContent--//
       let selectedSheetContent_ToLoad = {
         doctorList: [],
@@ -112,6 +111,12 @@ export default {
       this.selectedSheetYear = "";
       this.selectedSheetMonth = "";
       this.selectedSheetContent = {};
+    },
+    onAddSheet(){
+      
+    },
+    onBranch(sheet){
+
     }
   }
 };
