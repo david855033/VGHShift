@@ -24,7 +24,7 @@
             <td class="col-description" @click="setAssignArea(area)">{{area.description}}</td>
             <td class="col-abbr" @click="setAssignArea(area)">{{area.area_abbr}}</td>
             <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y)">
-              <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="((areaMatrix[y]||[])[x]||{}).doctor_abbr" @input="onAreaInput($event,y,x)">
+              <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="((areaMatrix[y]||[])[x]||{}).doctor_abbr" @input="onAreaInput($event,y,x)" @click="onAreaCellClick(area,x)">
             </td>
           </tr>
           <tr>
@@ -41,7 +41,7 @@
             <td class="col-description" @click="setAssignDoctor(doctor)">{{doctor.name}}</td>
             <td class="col-abbr" @click="setAssignDoctor(doctor)">{{doctor.doctor_abbr}}</td>
             <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y+selectedArea.length)">
-              <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" @keydown.prevent="onAnyKey($event,e,'doctor' ,doctor)" @focus="focus(x, y+selectedArea.length)" :value="((doctorMatrix[y]||[])[x]||{}).area_abbr" @input="onDoctorInput($event,y,x)">
+              <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" @keydown.prevent="onAnyKey($event,e,'doctor' ,doctor)" @focus="focus(x, y+selectedArea.length)" :value="((doctorMatrix[y]||[])[x]||{}).area_abbr" @input="onDoctorInput($event,y,x)" @click="onDoctorCellClick(doctor,x)">
             </td>
           </tr>
         </tbody>
@@ -101,6 +101,7 @@ export default {
       }
       return output;
     },
+
     distrinctDoctorGrade() {
       let vm = this;
       let doctorList = vm.sheetContent.doctorList;
@@ -129,6 +130,22 @@ export default {
     setAssignDoctor(doctor) {
       this.assignArea = {};
       this.assignDoctor = this.assignDoctor == doctor ? {} : doctor;
+    },
+    onAreaCellClick(area, x) {
+      let vm = this;
+      let assignDoctor = vm.assignDoctor;
+      if (assignDoctor.doctor_id) {
+        vm.arrange_ViewMatrix(area, x + 1, assignDoctor);
+        vm.arrange_AreaList(area, x + 1, assignDoctor);
+      }
+    },
+    onDoctorCellClick(doctor, x) {
+      let vm = this;
+      let assignArea = vm.assignArea;
+      if (assignArea.type_id) {
+        vm.arrange_ViewMatrix(assignArea, x + 1, doctor);
+        vm.arrange_AreaList(assignArea, x + 1, doctor);
+      }
     },
     resetfocus() {
       let focus_input = $(
@@ -281,10 +298,10 @@ export default {
       if (!clear) {
         areaList.forEach(row => {
           let current_arranged_duty_array = JSON.parse(row.arranged_duty);
-          if(current_arranged_duty_array[x] == doctor.doctor_id){
-            current_arranged_duty_array[x]="";
+          if (current_arranged_duty_array[x] == doctor.doctor_id) {
+            current_arranged_duty_array[x] = "";
           }
-          row.arranged_duty=JSON.stringify(current_arranged_duty_array);
+          row.arranged_duty = JSON.stringify(current_arranged_duty_array);
         });
       }
       //set new value
@@ -308,6 +325,7 @@ export default {
           vm.$set(areaMatrix[y], x, { doctor_abbr: doctor_abbr }); //areaMatrix初始值
         });
       });
+          this.assignArea = {};
     },
     renderDoctorMatrix() {
       let vm = this;
@@ -333,6 +351,7 @@ export default {
           }
         });
       });
+      this.assignDoctor = {};
     },
     onUp() {
       this.focus_y > 0 && (this.focus_y -= 1);
@@ -371,8 +390,8 @@ export default {
         this.renderDoctorMatrix();
       },
       deep: true
-  }
     }
+  }
 };
 </script>
 <style scoped>
