@@ -6,13 +6,13 @@
         <thead>
           <tr>
             <th colspan="2">日期</th>
-            <th v-for="(e,i) in calenderByYearMonth(sheetYear,sheetMonth)" :key="i">{{new Date(e.date).getDate()}}</th>
+            <th v-for="(e,i) in sheetContent.calender" :key="i">{{new Date(e.date).getDate()}}</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td colspan="2">以區排人</td>
-            <td :colspan="calenderByYearMonth(sheetYear,sheetMonth).length">
+            <td :colspan="sheetContent.calender.length">
               過濾器：
               <div class="form-check form-check-inline" v-for="(e, i) in distinctAreaAbbr" :key="i">
                 <input class="form-check-input" tabindex="-1" type="checkbox" :id="'inlineCheckboxArea'+i" :value="e" v-model="checkedArea">
@@ -23,13 +23,13 @@
           <tr v-for="(area,y) in selectedArea" :key="y">
             <td class="col-description" @click="setAssignArea(area)">{{area.description}}</td>
             <td class="col-abbr" @click="setAssignArea(area)">{{area.area_abbr}}</td>
-            <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y)">
+            <td class="cell" v-for="(e,x) in sheetContent.calender" :key="x" @click="focus(x,y)">
               <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="((areaMatrix[y]||[])[x]||{}).doctor_abbr" @input="onAreaInput($event,y,x)" @click="onAreaCellClick(area,x)">
             </td>
           </tr>
           <tr>
             <td :colspan="2">以人排區</td>
-            <td :colspan="calenderByYearMonth(sheetYear,sheetMonth).length">
+            <td :colspan="sheetContent.calender.length">
               過濾器：
               <div class="form-check form-check-inline" v-for="(e, i) in distrinctDoctorGrade" :key="i">
                 <input class="form-check-input" tabindex="-1" type="checkbox" :id="'inlineCheckboxGrade'+i" :value="e" v-model="checkedDoctor">
@@ -40,7 +40,7 @@
           <tr v-for="(doctor,y) in selectedDoctor" :key="y+selectedArea.length">
             <td class="col-description" @click="setAssignDoctor(doctor)">{{doctor.name}}</td>
             <td class="col-abbr" @click="setAssignDoctor(doctor)">{{doctor.doctor_abbr}}</td>
-            <td class="cell" v-for="(e,x) in calenderByYearMonth(sheetYear,sheetMonth)" :key="x" @click="focus(x,y+selectedArea.length)">
+            <td class="cell" v-for="(e,x) in sheetContent.calender" :key="x" @click="focus(x,y+selectedArea.length)">
               <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" @keydown.prevent="onAnyKey($event,e,'doctor' ,doctor)" @focus="focus(x, y+selectedArea.length)" :value="((doctorMatrix[y]||[])[x]||{}).area_abbr" @input="onDoctorInput($event,y,x)" @click="onDoctorCellClick(doctor,x)">
             </td>
           </tr>
@@ -50,8 +50,6 @@
   </div>
 </template>
 <script>
-import { mapGetters } from "vuex";
-
 export default {
   props: ["sheetContent", "sheetYear", "sheetMonth"],
   data() {
@@ -67,9 +65,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({
-      calenderByYearMonth: "getCalenderByYearMonth"
-    }),
     selectedArea() {
       let vm = this;
       if (vm.checkedArea.length == 0) {
@@ -317,7 +312,7 @@ export default {
       selectedArea.forEach((area, y) => {
         vm.$set(areaMatrix, y, []);
         let arranged_duty_array = JSON.parse(area.arranged_duty) || [];
-        vm.calenderByYearMonth(vm.sheetYear, vm.sheetMonth).forEach((d, x) => {
+        vm.sheetContent.calender.forEach((d, x) => {
           let doctor_id = arranged_duty_array[x];
           let doctor_abbr =
             (doctorList.find(x => x.doctor_id == doctor_id) || {})
@@ -325,7 +320,7 @@ export default {
           vm.$set(areaMatrix[y], x, { doctor_abbr: doctor_abbr }); //areaMatrix初始值
         });
       });
-          this.assignArea = {};
+      this.assignArea = {};
     },
     renderDoctorMatrix() {
       let vm = this;
@@ -334,7 +329,7 @@ export default {
       let areaList = vm.sheetContent.areaList;
       selectedDoctor.forEach((doctor, y) => {
         vm.$set(doctorMatrix, y, []);
-        vm.calenderByYearMonth(vm.sheetYear, vm.sheetMonth).forEach((d, x) => {
+        vm.sheetContent.calender.forEach((d, x) => {
           vm.$set(doctorMatrix[y], x, { area_abbr: "" }); //doctorMatrix初始值
         });
       });
