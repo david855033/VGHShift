@@ -1,5 +1,32 @@
 <template>
     <div>
+        <h5>從先前班表載入</h5>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>sheet_id</th>
+                    <th>year</th>
+                    <th>month</th>
+                    <th>section</th>
+                    <th>version</th>
+                    <th>status</th>
+                    <th>功能</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(sheet,i) in lastPublishedSheetByUserSection" :key="i">
+                    <td>{{sheet.sheet_id}}</td>
+                    <td>{{sheet.year}}</td>
+                    <td>{{sheet.month}}</td>
+                    <td>{{sheet.section}}</td>
+                    <td>{{sheet.version}}</td>
+                    <td>{{sheet.status}}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" @click='onLoadTypeListFromSheet(sheet)'>load</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
         <h5>從預設班型清單載入 (type filtered by user arrange_section)</h5>
         <table class="table table-sm">
             <thead>
@@ -17,7 +44,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(e,i) in typeByUserSection" :key="i">
+                <tr v-for="(e,i) in typeByUserSection" :key="i" v-show="!inTypeList(e)">
                     <td>{{e.type_id}}</td>
                     <td>{{e.section}}</td>
                     <td>{{e.description}}</td>
@@ -42,7 +69,7 @@
                     <th>平假</th>
                     <th>假平</th>
                     <th>假假</th>
-
+                    <th>功能</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,6 +81,9 @@
                     <td>{{e.work_to_holiday}}</td>
                     <td>{{e.holiday_to_work}}</td>
                     <td>{{e.holiday_to_holiday}}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" @click="deleteFromTypeList(e)">刪除</button>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -66,14 +96,27 @@ import util from "@/components/my-util";
 export default {
   props: ["sheetContent", "sheetYear", "sheetMonth"],
   computed: mapGetters({
-    typeByUserSection: "getTypeByUserSection"
+    typeByUserSection: "getTypeByUserSection",
+    lastPublishedSheetByUserSection: "getLastPublishedSheetByUserSection"
   }),
   methods: {
+    onLoadTypeListFromSheet(sheet) {
+      let vm = this;
+      if (!sheet.content) {
+        return;
+      }
+      let source_sheetContent = JSON.parse(sheet.content);
+      if (source_sheetContent.typeList) {
+        source_sheetContent.typeList.forEach(type =>
+          vm.addFromTypeList(type)
+        );
+      }
+    },
     addFromTypeList(e) {
       let vm = this;
       let sheetContent = vm.sheetContent;
       if (!sheetContent.typeList) return;
-      let isAlreadyInList = util.inArray(
+      let isAlreadyInList = _.some(
         sheetContent.typeList,
         x => x.type_id == e.type_id
       );
@@ -89,6 +132,11 @@ export default {
         } = e;
         util.fill_TypeArrange(e, vm);
         sheetContent.typeList.push(e);
+        sheetContent.typeList.sort(
+          (a, b) =>
+            Number(a.type_id.match(/\d+/)[0]) -
+            Number(b.type_id.match(/\d+/)[0])
+        );
       }
     },
     addAllFromTypeList() {
@@ -96,6 +144,17 @@ export default {
       vm.typeByUserSection.forEach(e => {
         vm.addFromTypeList(e);
       });
+    },
+    inTypeList(type) {
+      let vm = this;
+      return _.some(vm.sheetContent.typeList, x => x.type_id == type.type_id);
+    },
+    deleteFromTypeList(type) {
+      let typeList = this.sheetContent.typeList;
+      if (typeList) {
+        let index = typeList.findIndex(x => x.type_id == type.type_id);
+        typeList.splice(index, 1);
+      }
     }
   }
 };

@@ -1,11 +1,19 @@
 export default {
     getWorkingSheetByUserSection: state => {
         return state.sheetTable.filter(sheet =>
-            state.currentUser.section == sheet.section && sheet.status=="working")
+            state.currentUser.section == sheet.section && sheet.status == "working")
     },
     getPublishedSheetByUserSection: state => {
         return state.sheetTable.filter(sheet =>
-            state.currentUser.section == sheet.section && (sheet.status=="published"||sheet.status=="denied"))
+            state.currentUser.section == sheet.section && (sheet.status == "published" || sheet.status == "denied"))
+    },
+    getLastPublishedSheetByUserSection: state => {
+        let result = [];
+        let publishedSheet = state.sheetTable.filter(sheet =>
+            state.currentUser.section == sheet.section && sheet.status == "published")
+        let sorted = _.sortBy(publishedSheet, sheet => Number(sheet.year) * 12 + Number(sheet.month))
+        if (!_.isEmpty(sorted)) { result.push(sorted[sorted.length - 1]) }
+        return result;
     },
     getSheetByID: state => sheet_id => {
         return state.sheetTable.find(sheet => sheet.sheet_id === sheet_id)

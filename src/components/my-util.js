@@ -12,13 +12,6 @@ let fillWithReactivity = function (object, vm, keyList, arrayList) {
 }
 
 export default {
-    inArray: function (array, predicate) {
-        var length = array.length;
-        for (var i = 0; i < length; i++) {
-            if (predicate(array[i])) return true;
-        }
-        return false;
-    },
     fill_DoctorArrange: function (doctor, vm) {
         let keyList = ["doctor_id", "doctor_abbr", "name", "grade", "section", "code", "group"];
         let arrayList = ["book_dates"];
@@ -35,7 +28,7 @@ export default {
         fillWithReactivity(workhour, vm, keyList, arrayList)
     },
     fill_AreaArrange: function (area, vm) {
-        let keyList = ["type_id", "workhour_id", "area_abbr", "description"];
+        let keyList = ["area_id","type_id", "workhour_id", "area_abbr", "description"];
         let arrayList = ["available_grades", "arranged_duty"];
         fillWithReactivity(area, vm, keyList, arrayList)
     },

@@ -79,8 +79,10 @@ export default new Vuex.Store({
             { date: '2018-07-31', weekday: "2", is_holiday: false, description: "" }
         ],
         sheetTable: [
-            { sheet_id: 'S01', year: '2018', month: '7', section: 'PED', version: '1', status: 'working', content: '' },
-            { sheet_id: 'S02', year: '2018', month: '7', section: 'SURG', version: '1', status: 'working', content: '' }
+            { sheet_id: 'S01', year: '2018', month: '5', section: 'PED', version: '1', status: 'published', content: '' },
+            { sheet_id: 'S02', year: '2018', month: '6', section: 'PED', version: '1', status: 'published', content: '' },
+            { sheet_id: 'S03', year: '2018', month: '7', section: 'PED', version: '1', status: 'working', content: '' },
+            { sheet_id: 'S04', year: '2018', month: '7', section: 'SURG', version: '1', status: 'working', content: '' },
         ],
         bookDate: [
             {
