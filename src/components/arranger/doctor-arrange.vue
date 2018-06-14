@@ -68,40 +68,68 @@
           <th>name</th>
           <th>code</th>
           <th>group</th>
-          <th>book_dates</th>
+          <th>book_dates
+            <button type="button" class="btn btn-sm btn-primary py-0" @click="fetchAllBookDate">更新</button>
+          </th>
           <th>功能</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(doctor,i) in sheetContent.doctorList" :key="i">
           <td>{{doctor.doctor_id}}</td>
-          <td><input type="text" v-model="doctor.doctor_abbr"></td>
+          <td><input class="doctor-abbr" type="text" v-model="doctor.doctor_abbr"></td>
           <td>{{doctor.section}}</td>
-          <td>{{doctor.grade}}</td>
+          <td><input class="grade" type="text" v-model="doctor.grade"></td>
           <td>{{doctor.name}}</td>
           <td>{{doctor.code}}</td>
-          <td>{{doctor.group}}</td>
-          <td>
-            <div v-for="(book, i) in JSON.parse(doctor.book_dates)" :key="i"> {{book.date}},{{book.expect}},{{book.description}}
+          <td><input class="group" type="text" v-model="doctor.group"></td>
+          <td @click="()=>{showBookDate_doctor_id=doctor.doctor_id}">
+            <div>不值班:
+              <span v-show="showBookDate_doctor_id!=doctor.doctor_id">{{doctor.book_dates_n}}</span>
+            </div>
+            <div v-show="showBookDate_doctor_id==doctor.doctor_id" @click.stop>
+              <div v-for="(bookDate, j) in bookDateList_MatchDoctor(doctor,'n')" :key='"n"+j'>
+                {{bookDate.date}}:{{bookDate.description}}
+                <button type='button' class='close' @click='deleteBookDate(doctor,bookDate)'>
+                  <span>&times;</span>
+                </button>
+              </div>
+              <addBookDate @add="addBookDate(doctor,$event)"></addBookDate>
+            </div>
+            <div>想值班:{{doctor.book_dates_y}}</div>
+            <div v-show="showBookDate_doctor_id==doctor.doctor_id" @click.stop>
+              <div v-for="(bookDate, j) in bookDateList_MatchDoctor(doctor,'y')" :key='"y"+j'>
+                {{bookDate.date}}:{{bookDate.description}}
+                <button type='button' class='close' @click='deleteBookDate(doctor,bookDate)'>
+                  <span>&times;</span>
+                </button>
+              </div>
+              <addBookDate></addBookDate>
             </div>
           </td>
           <td>
-            <button class="btn btn-sm btn-primary" @click="deleteFromDoctorList(doctor)">刪除</button>
+            <button class="btn btn-sm btn-primary py-0" @click="fetchBookDate(doctor)">更新</button>
+            <button class="btn btn-sm btn-primary py-0" @click="deleteFromDoctorList(doctor)">刪除</button>
           </td>
         </tr>
+
       </tbody>
     </table>
-    <button type="button" class="btn btn-sm btn-primary" @click="fetchBookDate">更新bookdate</button>
+
   </div>
 </template>
 <script>
 import { mapGetters } from "vuex";
 import util from "@/components/my-util";
+import addBookDate from "./doctor-arrange/add-book-date-input-group";
 
 export default {
+  components: { addBookDate },
   props: ["sheetContent", "sheetYear", "sheetMonth"],
   data() {
-    return {};
+    return {
+      showBookDate_doctor_id: ""
+    };
   },
   computed: {
     ...mapGetters({
@@ -118,9 +146,9 @@ export default {
       }
       let source_sheetContent = JSON.parse(sheet.content);
       if (source_sheetContent.doctorList) {
-        source_sheetContent.doctorList.forEach(doctor =>
-          vm.addFromDoctorList(doctor)
-        );
+        source_sheetContent.doctorList.forEach(doctor => {
+          vm.addFromDoctorList(doctor);
+        });
       }
     },
     addFromDoctorList(doctor) {
@@ -132,14 +160,16 @@ export default {
         x => x.doctor_id == doctor.doctor_id
       );
       if (!isAlreadyInList) {
-        let { doctor_id, name, grade, section, code } = doctor; //doctor之欄位對應
-        util.fill_DoctorArrange(doctor, vm);
-        sheetContent.doctorList.push(doctor);
+        let { doctor_id, doctor_abbr, grade, section, name, code } = doctor; //需載入之doctor之欄位對應(不含group/bookdate)
+        let newDoctor = { doctor_id, doctor_abbr, name, grade, section, code };
+        util.fill_DoctorArrange(newDoctor, vm);
+        sheetContent.doctorList.push(newDoctor);
         sheetContent.doctorList.sort(
           (a, b) =>
             Number(a.doctor_id.match(/\d+/)[0]) -
             Number(b.doctor_id.match(/\d+/)[0])
         );
+        vm.fetchBookDate(newDoctor);
       }
     },
     addAllFromDoctorList() {
@@ -175,18 +205,73 @@ export default {
         }
       });
     },
-    fetchBookDate() {
+    bookDateList_MatchDoctor(doctor, expect) {
+      let vm = this;
+      let bookDateList = vm.sheetContent.bookDateList;
+      return bookDateList.filter(
+        x => x.doctor_id == doctor.doctor_id && x.expect == expect
+      );
+    },
+    fetchBookDate(doctor) {
+      let vm = this;
+      let bookDateList = vm.sheetContent.bookDateList;
+      _.remove(bookDateList, x => x.doctor_id == doctor.doctor_id);
+      let bookDates = vm.bookDatesByDoctorYearMonth(
+        doctor.doctor_id,
+        vm.sheetYear,
+        vm.sheetMonth
+      );
+      bookDates.forEach(bookDate => bookDateList.push(bookDate));
+      vm.organizeBookDate(doctor);
+    },
+    fetchAllBookDate() {
       let vm = this;
       let doctorList = vm.sheetContent.doctorList;
-      if (!doctorList) return;
-      for (var i = 0; i < doctorList.length; i++) {
-        let bookDates = vm.bookDatesByDoctorYearMonth(
-          doctorList[i].doctor_id,
-          vm.sheetYear,
-          vm.sheetMonth
-        );
-        doctorList[i].book_dates = bookDates;
-      }
+      let bookDateList = vm.sheetContent.bookDateList;
+      if (!doctorList || !bookDateList) return;
+      doctorList.forEach(doctor => vm.fetchBookDate(doctor));
+    },
+    organizeBookDate(doctor) {
+      let vm = this;
+      let bookDateList = vm.sheetContent.bookDateList;
+
+      doctor.book_dates_n = "";
+      doctor.book_dates_y = "";
+
+      let bookDateList_matchDoctor = bookDateList.filter(
+        x => x.doctor_id == doctor.doctor_id
+      );
+      bookDateList_matchDoctor.forEach(bookDate => {
+        if (doctor) {
+          if (bookDate.expect == "n") {
+            doctor.book_dates_n += bookDate.date + ",";
+          } else if (bookDate.expect == "y")
+            doctor.book_dates_y += bookDate.date + ",";
+        }
+      });
+
+      doctor.book_dates_n = _.trimEnd(doctor.book_dates_n, ",");
+      doctor.book_dates_y = _.trimEnd(doctor.book_dates_y, ",");
+    },
+    deleteBookDate(doctor, bookDate) {
+      let vm = this;
+      let bookDateList = vm.sheetContent.bookDateList;
+      let index = bookDateList.findIndex(
+        x =>
+          x.doctor_id == bookDate.doctor_id &&
+          x.expect == bookDate.expect &&
+          x.date == bookDate.date
+      );
+      bookDateList.splice(index, 1);
+      vm.organizeBookDate(doctor);
+    },
+    addBookDate(doctor, string) {
+      let vm = this;
+      let bookDateList = vm.sheetContent.bookDateList;
+      let matchString = string.match(/\d+(:.+)?/g);
+      console.log(matchString)
+      //todo add logic
+      vm.organizeBookDate(doctor);
     }
   }
 };
@@ -196,12 +281,20 @@ h5 {
   margin-top: 10px;
 }
 input[type="text"] {
-  width: 25px;
   height: 25px;
   text-align: center;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
+}
+input.doctor-abbr {
+  width: 25px;
+}
+input.grade {
+  width: 60px;
+}
+input.group {
+  width: 40px;
 }
 </style>
 

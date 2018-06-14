@@ -13,8 +13,8 @@ let fillWithReactivity = function (object, vm, keyList, arrayList) {
 
 export default {
     fill_DoctorArrange: function (doctor, vm) {
-        let keyList = ["doctor_id", "doctor_abbr", "name", "grade", "section", "code", "group"];
-        let arrayList = ["book_dates"];
+        let keyList = ["doctor_id", "doctor_abbr", "name", "grade", "section", "code", "group", "book_dates_n", "book_dates_y"];
+        let arrayList = [];
         fillWithReactivity(doctor, vm, keyList, arrayList)
     },
     fill_TypeArrange: function (type, vm) {
@@ -28,7 +28,7 @@ export default {
         fillWithReactivity(workhour, vm, keyList, arrayList)
     },
     fill_AreaArrange: function (area, vm) {
-        let keyList = ["area_id","type_id", "workhour_id", "area_abbr", "description"];
+        let keyList = ["area_id", "type_id", "workhour_id", "area_abbr", "description"];
         let arrayList = ["available_grades", "arranged_duty"];
         fillWithReactivity(area, vm, keyList, arrayList)
     },

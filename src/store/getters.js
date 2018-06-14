@@ -23,14 +23,14 @@ export default {
             state.currentUser.section == doctor.section)
     },
     getBookDatesByDoctorYearMonth: state => (doctor_id, year, month) => {
-        let findDoctorBookDate = state.bookDate.find(
+        let findDoctorBookDate = state.bookDate.filter(
             x => x.doctor_id == doctor_id &&
                 x.year == year &&
                 x.month == month);
-        if (findDoctorBookDate) {
-            return findDoctorBookDate.book_dates;
+        if (!_.isEmpty(findDoctorBookDate)) {
+            return findDoctorBookDate;
         } else {
-            return JSON.stringify([]);
+            return [];
         }
     },
     getTypeByUserSection: state => {

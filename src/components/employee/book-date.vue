@@ -7,7 +7,9 @@
                     <th>doctor_id</th>
                     <th>year</th>
                     <th>month</th>
-                    <th>book_dates (date, expect, description)</th>
+                    <th>date</th>
+                    <th>expect</th>
+                    <th>description</th>
                 </tr>
             </thead>
             <tbody>
@@ -15,9 +17,9 @@
                     <td>{{e.doctor_id}}</td>
                     <td>{{e.year}}</td>
                     <td>{{e.month}}</td>
-                    <td>
-                        <div v-for="(book,i) in JSON.parse(e.book_dates)" :key="i">{{book.date}},{{book.expect}},{{book.description}}</div>
-                    </td>
+                    <td>{{e.date}}</td>
+                    <td>{{e.expect}}</td>
+                    <td>{{e.description}}</td>
                 </tr>
             </tbody>
         </table>

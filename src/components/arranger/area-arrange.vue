@@ -166,7 +166,7 @@ export default {
       if (!sheetContent.areaList) return;
       let newArea = {
         type_id: e.type_id,
-        description: "__description__",
+        description: "",
         available_grades: JSON.stringify(["R1", "R2", "R3"])
       };
       let id_list = sheetContent.areaList.map(x => {
@@ -174,7 +174,7 @@ export default {
         if (_.isEmpty(match)) return 0;
         return match[0];
       });
-      let next_area_id = Number(_.max(id_list)||0) + 1;
+      let next_area_id = Number(_.max(id_list) || 0) + 1;
       newArea.area_id = "A" + _.padStart(next_area_id, 2, "0");
       util.fill_AreaArrange(newArea, vm);
       sheetContent.areaList.push(newArea);

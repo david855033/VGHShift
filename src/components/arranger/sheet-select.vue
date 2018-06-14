@@ -106,6 +106,7 @@ export default {
       //--初始化SheetContent--//
       let selectedSheetContent_ToLoad = {
         doctorList: [],
+        bookDateList:[],
         typeList: [],
         workhourList: [],
         calender: [],

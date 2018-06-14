@@ -24,9 +24,9 @@ let createDoctorTable = function (parameter) {
 
 export default new Vuex.Store({
     state: {
-        enviroment:{
-            new_sheet_year:2018,
-            new_sheet_month:7,
+        enviroment: {
+            new_sheet_year: 2018,
+            new_sheet_month: 7,
         },
         currentUser: {
             user_id: "U01", section: "PED"
@@ -85,13 +85,10 @@ export default new Vuex.Store({
             { sheet_id: 'S04', year: '2018', month: '7', section: 'SURG', version: '1', status: 'working', content: '' },
         ],
         bookDate: [
-            {
-                doctor_id: 'D1', year: 2018, month: 7,
-                book_dates: JSON.stringify([
-                    { date: 1, expect: "n", description: "lazy" },
-                    { date: 2, expect: "n", description: "lazy" },
-                    { date: 3, expect: "n", description: "lazy" }])
-            }
+            { doctor_id: 'D1', year: 2018, month: 7, date: 1, expect: "n", description: "結婚" },
+            { doctor_id: 'D1', year: 2018, month: 7, date: 2, expect: "n", description: "出國" },
+            { doctor_id: 'D1', year: 2018, month: 7, date: 3, expect: "n", description: "小孩畢業典禮" },
+            { doctor_id: 'D1', year: 2018, month: 7, date: 5, expect: "y", description: "這天想值班" }
         ]
     },
     getters,
