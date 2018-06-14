@@ -363,7 +363,7 @@ export default {
     },
     onRight() {
       this.focus_x <
-        this.calenderByYearMonth(this.sheetYear, this.sheetMonth).length - 1 &&
+        this.sheetContent.calender.length - 1 &&
         (this.focus_x += 1);
       this.resetfocus();
     }

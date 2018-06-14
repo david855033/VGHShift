@@ -1,7 +1,11 @@
 export default {
-    getSheetByUserSection: state => {
+    getWorkingSheetByUserSection: state => {
         return state.sheetTable.filter(sheet =>
-            state.currentUser.section == sheet.section)
+            state.currentUser.section == sheet.section && sheet.status=="working")
+    },
+    getPublishedSheetByUserSection: state => {
+        return state.sheetTable.filter(sheet =>
+            state.currentUser.section == sheet.section && (sheet.status=="published"||sheet.status=="denied"))
     },
     getSheetByID: state => sheet_id => {
         return state.sheetTable.find(sheet => sheet.sheet_id === sheet_id)
@@ -27,7 +31,7 @@ export default {
     },
     getWorkhourByUserSection: state => {
         return state.workhourTable.filter(workhour =>
-            state.currentUser.section == workhour.section >= 0)
+            state.currentUser.section == workhour.section)
     },
     getCalenderByYearMonth: state => (year, month) => {
         return state.calenderTable.filter(x => {

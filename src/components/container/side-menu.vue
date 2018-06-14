@@ -2,8 +2,8 @@
     <div id="side-menu-root">
         <div id="user" class="mb-3">
             User
-            <div class="ml-3">{{currentUser.user_id}}</div>
-            <div class="ml-3">{{currentUser.arrange_section}}</div>
+            <div class="ml-3">UID:{{currentUser.user_id}}</div>
+            <div class="ml-3">Section:{{currentUser.section}}</div>
         </div>
         <ul>
             <li>
@@ -17,7 +17,7 @@
                 <li>
                     <router-link to="/type-list-manage">type list</router-link>
                 </li>
-                 <li>
+                <li>
                     <router-link to="/workhour-list-manage">workhour list</router-link>
                 </li>
                 <li>
@@ -42,7 +42,7 @@
                     <li>
                         <router-link to="/sheet-select/workhour-arrange">workhour</router-link>
                     </li>
-                     <li>
+                    <li>
                         <router-link to="/sheet-select/area-arrange">area</router-link>
                     </li>
                     <li>
@@ -80,6 +80,6 @@ export default {
   height: 100%;
 }
 a {
-    color: blue;
+  color: blue;
 }
 </style>
