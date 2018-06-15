@@ -83,7 +83,7 @@
           <td>{{doctor.name}}</td>
           <td>{{doctor.code}}</td>
           <td><input class="group" type="text" v-model="doctor.group"></td>
-          <td @click="()=>{showBookDate_doctor_id=doctor.doctor_id}">
+          <td>
             <div>不值班:
               <span v-show="showBookDate_doctor_id!=doctor.doctor_id">{{doctor.book_dates_n}}</span>
             </div>
@@ -109,6 +109,7 @@
           </td>
           <td>
             <button class="btn btn-sm btn-primary py-0" @click="fetchBookDate(doctor)">更新</button>
+            <button class="btn btn-sm btn-primary py-0" @click="()=>{showBookDate_doctor_id=showBookDate_doctor_id==doctor.doctor_id?'':doctor.doctor_id}">編輯</button>
             <button class="btn btn-sm btn-primary py-0" @click="deleteFromDoctorList(doctor)">刪除</button>
           </td>
         </tr>
