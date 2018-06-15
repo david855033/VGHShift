@@ -99,14 +99,20 @@ export default {
     calenderByYearMonth: "getCalenderByYearMonth"
   }),
   methods: {
-    ...mapMutations(["addSheet", "deleteSheet", "publishSheet", "denySheet","saveSheet"]),
+    ...mapMutations([
+      "addSheet",
+      "deleteSheet",
+      "publishSheet",
+      "denySheet",
+      "saveSheet"
+    ]),
     selectSheet(sheet_id) {
       let vm = this;
       let selectedSheet = vm.getSheetByID(sheet_id); //從store中取出sheet
       //--初始化SheetContent--//
       let selectedSheetContent_ToLoad = {
         doctorList: [],
-        bookDateList:[],
+        bookDateList: [],
         typeList: [],
         workhourList: [],
         calender: [],
@@ -155,7 +161,7 @@ export default {
       this.denySheet({ sheet });
     },
     onSave() {
-      let vm=this;
+      let vm = this;
       vm.saveSheet({
         sheet_id: vm.selectedSheetID,
         content: JSON.stringify(vm.selectedSheetContent)

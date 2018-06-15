@@ -22,6 +22,10 @@ export default {
         return state.doctorTable.filter(doctor =>
             state.currentUser.section == doctor.section)
     },
+    getdoctorByID: state => doctor_id => {
+        return state.doctorTable.find(doctor =>
+            doctor.doctor_id == doctor_id)
+    },
     getBookDatesByDoctorYearMonth: state => (doctor_id, year, month) => {
         let findDoctorBookDate = state.bookDate.filter(
             x => x.doctor_id == doctor_id &&

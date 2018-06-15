@@ -94,7 +94,7 @@
                   <span>&times;</span>
                 </button>
               </div>
-              <addBookDate @add="addBookDate(doctor,$event)"></addBookDate>
+              <addBookDate @add="addBookDate(doctor,'n',$event)"></addBookDate>
             </div>
             <div>想值班:{{doctor.book_dates_y}}</div>
             <div v-show="showBookDate_doctor_id==doctor.doctor_id" @click.stop>
@@ -104,7 +104,7 @@
                   <span>&times;</span>
                 </button>
               </div>
-              <addBookDate></addBookDate>
+              <addBookDate @add="addBookDate(doctor,'y',$event)"></addBookDate>
             </div>
           </td>
           <td>
@@ -134,6 +134,7 @@ export default {
   computed: {
     ...mapGetters({
       doctorByUserSection: "getDoctorByUserSection",
+      doctorByID: "getdoctorByID",
       lastPublishedSheetByUserSection: "getLastPublishedSheetByUserSection",
       bookDatesByDoctorYearMonth: "getBookDatesByDoctorYearMonth"
     })
@@ -155,12 +156,20 @@ export default {
       let vm = this;
       let sheetContent = vm.sheetContent;
       if (!sheetContent.doctorList) return;
+
+      let doctorFromDataBase = vm.doctorByID(doctor.doctor_id); //確認資料庫內有無此醫師
+      if (!doctorFromDataBase) return;
+
       let isAlreadyInList = _.some(
         sheetContent.doctorList,
         x => x.doctor_id == doctor.doctor_id
       );
       if (!isAlreadyInList) {
-        let { doctor_id, doctor_abbr, grade, section, name, code } = doctor; //需載入之doctor之欄位對應(不含group/bookdate)
+        //需載入之之前doctor之欄位對應(不含group/bookdate)
+        let { doctor_id, doctor_abbr } = doctor;
+        //需從資料庫讀取之欄位
+        let { name, grade, section, code } = doctorFromDataBase;
+
         let newDoctor = { doctor_id, doctor_abbr, name, grade, section, code };
         util.fill_DoctorArrange(newDoctor, vm);
         sheetContent.doctorList.push(newDoctor);
@@ -265,13 +274,29 @@ export default {
       bookDateList.splice(index, 1);
       vm.organizeBookDate(doctor);
     },
-    addBookDate(doctor, string) {
+    addBookDate(doctor, expect, event) {
       let vm = this;
       let bookDateList = vm.sheetContent.bookDateList;
-      let matchString = string.match(/\d+(:.+)?/g);
-      console.log(matchString)
-      //todo add logic
-      vm.organizeBookDate(doctor);
+      let calender = vm.sheetContent.calender;
+      let { date, description } = event;
+      let maxDate = _.maxBy(calender, "date").date.split("-")[2];
+      if (date <= maxDate) {
+        let duplicate_bookDate = bookDateList.find(x => x.date == date);
+        if (duplicate_bookDate) {
+          vm.deleteBookDate(doctor, duplicate_bookDate);
+        }
+        let newBookDate = {
+          doctor_id: doctor.doctor_id,
+          year: vm.sheetYear,
+          month: vm.sheetMonth,
+          date,
+          expect,
+          description
+        };
+        bookDateList.push(newBookDate);
+        bookDateList.sort((a, b) => a.date - b.date);
+        vm.organizeBookDate(doctor);
+      }
     }
   }
 };
