@@ -54,9 +54,44 @@
         </tr>
       </tbody>
     </table>
+    <h5 class="inline-block">以燈號查詢醫師</h5>
+    <div class="inline-block">
+      <div class="input-group input-group-sm" id="search-doctor">
+        <input type="text" class="form-control" placeholder="燈號" v-model="query_doctor_code">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" @click="getDoctorByCode">查詢</button>
+        </div>
+      </div>
+    </div>
+
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>doctor_id</th>
+          <th>name</th>
+          <th>grade</th>
+          <th>section</th>
+          <th>code</th>
+          <th>功能</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(doctor,i) in queryDoctorByCodeResult" :key="i">
+          <td>{{doctor.doctor_id}}</td>
+          <td>{{doctor.name}}</td>
+          <td>{{doctor.grade}}</td>
+          <td>{{doctor.section}}</td>
+          <td>{{doctor.code}}</td>
+          <td>
+            <button class="btn btn-sm py-0" @click="addFromDoctorList(doctor)" v-show="!inDoctorList(doctor)">加入</button>
+            <div v-show="inDoctorList(doctor)">已加入</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <h5>本次排班醫師清單</h5>
-    <table class="table table-sm">
+    <table class="table table-sm" id="doctor-list-table">
       <thead>
         <tr>
           <th>doctor_id</th>
@@ -68,6 +103,7 @@
           <th>name</th>
           <th>code</th>
           <th>group</th>
+          <th>pregnant</th>
           <th>book_dates
             <button type="button" class="btn btn-sm btn-primary py-0" @click="fetchAllBookDate">更新</button>
           </th>
@@ -83,6 +119,12 @@
           <td>{{doctor.name}}</td>
           <td>{{doctor.code}}</td>
           <td><input class="group" type="text" v-model="doctor.group"></td>
+          <td>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" :id="'pregnant'+i" v-model="doctor.pregnant">
+              <label class="form-check-label" :for="'pregnant'+i">懷孕</label>
+            </div>
+          </td>
           <td>
             <div>不值班:
               <span v-show="showBookDate_doctor_id!=doctor.doctor_id">{{doctor.book_dates_n}}</span>
@@ -113,7 +155,6 @@
             <button class="btn btn-sm btn-primary py-0" @click="deleteFromDoctorList(doctor)">刪除</button>
           </td>
         </tr>
-
       </tbody>
     </table>
 
@@ -129,6 +170,8 @@ export default {
   props: ["sheetContent", "sheetYear", "sheetMonth"],
   data() {
     return {
+      query_doctor_code: "",
+      queryDoctorByCodeResult: [],
       showBookDate_doctor_id: ""
     };
   },
@@ -136,6 +179,7 @@ export default {
     ...mapGetters({
       doctorByUserSection: "getDoctorByUserSection",
       doctorByID: "getdoctorByID",
+      doctorByCode: "getdoctorByCode",
       lastPublishedSheetByUserSection: "getLastPublishedSheetByUserSection",
       bookDatesByDoctorYearMonth: "getBookDatesByDoctorYearMonth"
     })
@@ -166,12 +210,20 @@ export default {
         x => x.doctor_id == doctor.doctor_id
       );
       if (!isAlreadyInList) {
-        //需載入之之前doctor之欄位對應(不含group/bookdate)
-        let { doctor_id, doctor_abbr } = doctor;
+        //需載入之上次sheet內doctorList之欄位對應
+        let { doctor_id, doctor_abbr, pregnant } = doctor;
         //需從資料庫讀取之欄位
         let { name, grade, section, code } = doctorFromDataBase;
-
-        let newDoctor = { doctor_id, doctor_abbr, name, grade, section, code };
+        let newDoctor = {
+          doctor_id,
+          doctor_abbr,
+          name,
+          grade,
+          section,
+          code,
+          pregnant
+        };
+        //note: group及book_dates不載入
         util.fill_DoctorArrange(newDoctor, vm);
         sheetContent.doctorList.push(newDoctor);
         sheetContent.doctorList.sort(
@@ -259,7 +311,6 @@ export default {
             doctor.book_dates_y += bookDate.date + ",";
         }
       });
-
       doctor.book_dates_n = _.trimEnd(doctor.book_dates_n, ",");
       doctor.book_dates_y = _.trimEnd(doctor.book_dates_y, ",");
     },
@@ -298,15 +349,25 @@ export default {
         bookDateList.sort((a, b) => a.date - b.date);
         vm.organizeBookDate(doctor);
       }
+    },
+    getDoctorByCode() {
+      let vm = this;
+      if (vm.query_doctor_code) {
+        vm.queryDoctorByCodeResult = vm.doctorByCode(vm.query_doctor_code);
+      }
     }
   }
 };
 </script>
 <style lang="scss" scoped>
+@import "@/styles/common.scss";
 h5 {
   margin-top: 10px;
 }
-input[type="text"] {
+#search-doctor {
+  width: 200px;
+}
+#doctor-list-table input[type="text"] {
   height: 25px;
   text-align: center;
   box-sizing: border-box;

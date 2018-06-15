@@ -31,12 +31,11 @@ export default new Vuex.Store({
         currentUser: {
             user_id: "U01", section: "PED"
         },
-        doctorTable: createDoctorTable({ V: 5, CR: 5, R3: 5, R2: 5, R1: 5, PGY: 10 }),
-        //  [
-        //     { doctor_id: 'D01', id: 'F123456789', name: "王大明", grade: "V", section: 'PED', phs: '3999', code: 'DOC3999A' },
-        //     { doctor_id: 'D02', id: 'A123456789', name: "張國強", grade: "R2", section: 'PED', phs: '3987', code: 'DOC3987B' },
-        //     { doctor_id: 'D03', id: 'Z123456789', name: "李小華", grade: "V", section: 'SURG', phs: '2345', code: 'DOC2456A' }
-        // ],
+        doctorTable: [...createDoctorTable({ V: 5, CR: 5, R3: 5, R2: 5, R1: 5, PGY: 10 }),
+
+        { doctor_id: 'D99', id: 'F123456789', name: "王大明", grade: "V", section: 'SURG', phs: '2100', code: 'DOC2100A' }
+        ],
+
         typeTable: [
             { type_id: 'T01', section: 'PED', description: '住院醫師班', work_to_work: "1630-0730", work_to_holiday: "1630-0800", holiday_to_work: "0800-0730", holiday_to_holiday: "0800-0800" },
             { type_id: 'T02', section: 'PED', description: '急診夜班', work_to_work: "1930-0730", work_to_holiday: "1930-0730", holiday_to_work: "1930-0730", holiday_to_holiday: "1930-0730" },

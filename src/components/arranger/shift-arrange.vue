@@ -178,7 +178,6 @@ export default {
         } else if (e.code == "ArrowLeft") {
           vm.onLeft();
         } else if (e.code == "Backspace" || e.code == "Delete") {
-          //TODO DELETE DUTY
           if (updateType == "doctor") {
             //delete in doctor cell
             let doctor = rowElement;
@@ -192,7 +191,7 @@ export default {
               vm.arrange_AreaList(area, date, doctor, true);
             });
           } else if (updateType == "area") {
-            //todo: delete in area cell
+            //delete in area cell
             let area = rowElement;
             let y = selectedArea.findIndex(x => x.area_abbr == area.area_abbr);
             let doctor_abbr = areaMatrix[y][date - 1].doctor_abbr;
@@ -236,7 +235,6 @@ export default {
             let matchDoctor = selectedDoctor.filter(
               x => x.doctor_abbr == value
             );
-
             //update view and areaList
             matchDoctor.forEach(doctor => {
               vm.arrange_ViewMatrix(area, date, doctor);
@@ -251,6 +249,7 @@ export default {
         vm.onLeft();
       }
     },
+    //改變Matrix內容
     arrange_ViewMatrix(area, date, doctor, clear) {
       let vm = this;
       let areaList = vm.sheetContent.areaList;
@@ -285,10 +284,13 @@ export default {
       //rendering matched cell in doctorMatrix
       doctorMatrix[y_doctor][x].area_abbr = clear ? "" : area.area_abbr;
     },
+     //改變AreaList內容
     arrange_AreaList(area, date, doctor, clear) {
+      //TODO: doctor is pregnant + area is pregnant cover 
+      //   -> push to arranged_duty_pregnant
       let areaList = this.sheetContent.areaList;
       let x = date - 1;
-      //remove duplicate
+      //remove duplicate in same day
       if (!clear) {
         areaList.forEach(row => {
           let current_arranged_duty_array = JSON.parse(row.arranged_duty);
@@ -304,6 +306,8 @@ export default {
       area.arranged_duty = JSON.stringify(array);
     },
     renderAreaMatrix() {
+      //TODO: area is pregnant cover
+      // -> render arranged_duty_pregnant as 'A/B'
       let vm = this;
       let doctorList = vm.sheetContent.doctorList;
       let selectedArea = vm.selectedArea;
@@ -322,6 +326,8 @@ export default {
       this.assignArea = {};
     },
     renderDoctorMatrix() {
+      //TODO: doctor is pregnant 
+      // -> render arranged_duty_pregnant 'A*'
       let vm = this;
       let selectedDoctor = vm.selectedDoctor;
       let doctorMatrix = vm.doctorMatrix;
@@ -362,8 +368,7 @@ export default {
       this.resetfocus();
     },
     onRight() {
-      this.focus_x <
-        this.sheetContent.calender.length - 1 &&
+      this.focus_x < this.sheetContent.calender.length - 1 &&
         (this.focus_x += 1);
       this.resetfocus();
     }
@@ -388,7 +393,8 @@ export default {
   }
 };
 </script>
-<style scoped>
+<style lang="scss" scoped >
+@import "./shift-arrange.scss";
 .table {
   margin: auto;
 }

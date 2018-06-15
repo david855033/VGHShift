@@ -22,7 +22,7 @@
                     <td>{{sheet.version}}</td>
                     <td>{{sheet.status}}</td>
                     <td>
-                        <button class="btn btn-sm btn-primary" @click='onLoadAreaListFromSheet(sheet)'>load</button>
+                        <button class="btn btn-sm btn-primary" @click='onLoadAreaListFromSheet(sheet)'>load and replace</button>
                     </td>
                 </tr>
             </tbody>
@@ -83,7 +83,7 @@
             </tbody>
         </table>
         <h5>值班區域</h5>
-        <table class="table table-sm">
+        <table class="table table-sm" id="area-list-table">
             <thead>
                 <tr>
                     <th>area_id</th>
@@ -92,23 +92,40 @@
                     <th>area_abbr</th>
                     <th>description</th>
                     <th>available_grades</th>
+                    <th>pregnant_cover</th>
                     <th>功能</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(e,i) in sheetContent.areaList" :key="i">
-                    <td>{{e.area_id}}</td>
-                    <td>{{e.type_id}}</td>
-                    <td><input type="text" class="workhour-id" v-model="e.workhour_id"></td>
-                    <td><input type="text" class="area-abbr" v-model="e.area_abbr"></td>
-                    <td><input type="text" v-model="e.description"></td>
+                <tr v-for="(area,i) in sheetContent.areaList" :key="i">
+                    <td>{{area.area_id}}</td>
                     <td>
-                        <div v-for="(grade, g) in JSON.parse(e.available_grades)" :key="g">
-                            {{grade}}
+                        <select v-model="area.type_id">
+                            <option v-for="(type, ti) in sheetContent.typeList" :key="ti">{{type.type_id}}</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select v-model="area.workhour_id">
+                            <option value=""></option>
+                            <option v-for="(workhour, ti) in sheetContent.workhourList" :key="ti">{{workhour.workhour_id}}</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="area-abbr" v-model="area.area_abbr"></td>
+                    <td><input type="text" v-model="area.description"></td>
+                    <td>
+                        <div class="form-check form-check-inline" v-for="(grade, j) in distrinctDoctorGrade" :key="i+'-'+j">
+                            <input class="form-check-input" type="checkbox" :id="'checkGrade'+i+'-'+j" :value="grade" v-model="area.available_grades_array" @change="changeAvailableGrades(area)">
+                            <label class="form-check-label" :for="'checkGrade'+i+'-'+j">{{grade}}</label>
                         </div>
                     </td>
                     <td>
-                        <button class="btn btn-sm btn-primary" @click="deleteFromAreaList(e)">刪除</button>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" :id="'pregnant'+i" v-model="area.pregnant_cover">
+                            <label class="form-check-label" :for="'pregnant'+i">懷孕cover</label>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" @click="deleteFromAreaList(area)">刪除</button>
                     </td>
                 </tr>
             </tbody>
@@ -121,10 +138,23 @@ import util from "@/components/my-util";
 
 export default {
   props: ["sheetContent", "sheetYear", "sheetMonth"],
-  computed: mapGetters({
-    typeByUserSection: "getTypeByUserSection",
-    lastPublishedSheetByUserSection: "getLastPublishedSheetByUserSection"
-  }),
+  computed: {
+    ...mapGetters({
+      typeByUserSection: "getTypeByUserSection",
+      lastPublishedSheetByUserSection: "getLastPublishedSheetByUserSection"
+    }),
+    distrinctDoctorGrade() {
+      let vm = this;
+      let doctorList = vm.sheetContent.doctorList;
+      let output = [];
+      if (doctorList) {
+        doctorList.forEach(e => {
+          if (output.indexOf(e.grade) < 0) output.push(e.grade);
+        });
+      }
+      return output;
+    }
+  },
   methods: {
     onLoadAreaListFromSheet(sheet) {
       let vm = this;
@@ -133,6 +163,7 @@ export default {
       }
       let source_sheetContent = JSON.parse(sheet.content);
       if (source_sheetContent.areaList) {
+        vm.sheetContent.areaList.splice(0, vm.sheetContent.areaList.length);
         source_sheetContent.areaList.forEach(area => vm.addFromAreaList(area));
       }
     },
@@ -140,21 +171,24 @@ export default {
       let vm = this;
       let sheetContent = vm.sheetContent;
       if (!sheetContent.areaList) return;
-      if (_.some(sheetContent.areaList, x => x.description == area.description))
-        return;
       let {
+        area_id,
         type_id,
         workhour_id,
         area_abbr,
         description,
-        available_grades
+        available_grades,
+        pregnant_cover
       } = area;
       let newArea = {
+        area_id,
         type_id,
         workhour_id,
         area_abbr,
         description,
-        available_grades
+        available_grades,
+        available_grades_array: JSON.parse(available_grades),
+        pregnant_cover
       };
 
       util.fill_AreaArrange(newArea, vm);
@@ -167,7 +201,7 @@ export default {
       let newArea = {
         type_id: e.type_id,
         description: "",
-        available_grades: JSON.stringify(["R1", "R2", "R3"])
+        available_grades_array: []
       };
       let id_list = sheetContent.areaList.map(x => {
         let match = x.area_id.match(/\d+/);
@@ -185,6 +219,9 @@ export default {
         let index = areaList.findIndex(x => x.area_id == area.area_id);
         areaList.splice(index, 1);
       }
+    },
+    changeAvailableGrades(area) {
+      area.available_grades = JSON.stringify(area.available_grades_array);
     }
   }
 };
@@ -194,12 +231,19 @@ export default {
 h5 {
   margin-top: 10px;
 }
+#area-list-table input[type="text"] {
+  height: 25px;
+  text-align: center;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
 input.workhour-id {
   width: 100px;
   text-align: center;
 }
 input.area-abbr {
-  width: 60px;
+  width: 30px;
   text-align: center;
 }
 </style>
