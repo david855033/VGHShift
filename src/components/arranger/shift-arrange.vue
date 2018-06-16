@@ -25,6 +25,9 @@
             <td class="col-abbr" @click="setAssignArea(area)">{{area.area_abbr}}</td>
             <td class="cell" v-for="(e,x) in sheetContent.calender" :class="((areaMatrix[y]||[])[x]||{}).class" :key="x" @click="focus(x,y)">
               <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="((areaMatrix[y]||[])[x]||{}).doctor_abbr" @input="onAreaInput($event,y,x)" @click="onAreaCellClick(area,x)">
+              <span v-for="(message, message_index) in ((areaMatrix[y]||[])[x]||{}).message" :class="message.class" :key="message_index">
+                {{message.text}}
+              </span>
             </td>
           </tr>
           <tr>
@@ -370,7 +373,7 @@ export default {
         array[x] = clear ? "" : doctor.doctor_id;
         area.arranged_duty = JSON.stringify(array);
       }
-      shiftChecker.check(this, {area,date,doctor});
+      shiftChecker.check(this, { area, date, doctor });
     },
     renderAreaMatrix() {
       //TODO: area is pregnant cover
@@ -522,7 +525,7 @@ th {
   text-align: center;
 }
 table {
-  max-width: 1100px;
+  max-width: 1250px;
 }
 
 $color-hover: hsl(40, 90, 95);
@@ -546,7 +549,7 @@ td {
   }
   &.cell {
     width: 30px;
-    max-width: 30px;
+    min-width: 35px;
     border: 1px solid hsl(0, 0, 90);
     input {
       border: 0px;
@@ -555,7 +558,7 @@ td {
   }
 }
 input[type="text"] {
-  width: 30px;
+  width: 35px;
   height: 30px;
   text-align: center;
   box-sizing: border-box;

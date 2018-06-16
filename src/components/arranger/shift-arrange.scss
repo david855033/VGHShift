@@ -1,6 +1,38 @@
 td.cell {
-    &.bg-grey{
-        border:1px solid hsl(0,0,80);
-        background-color: hsl(0,0,90);
+    position: relative;
+    &.bg-grey {
+        border: 1px solid hsl(0, 0, 80);
+        background-color: hsl(0, 0, 90);
     }
+}
+
+td.cell>span {
+    visibility: hidden;
+    font-size: 0.8em;
+    text-align: center;
+    border-radius: 3px;
+    position: absolute;
+    z-index: 1;
+    padding: 0px 5px;
+    top: -55%;
+    left: 5px;
+    &::after {
+        content: " ";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+    }
+    &.red {
+        background-color: red;
+        &::after {
+            border-color: red transparent transparent transparent;
+        }
+    }
+}
+
+td.cell:hover>span,input:focus+span,td.cell>span.show {
+    visibility: visible;
 }

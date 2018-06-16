@@ -11,13 +11,13 @@ export default {
             doctorMatrix.forEach(row => {
                 row.forEach(cell => {
                     cell.class = ['bg-grey']
-                    cell.message = { text: 'hi', class: 'red' }
+                    cell.message = [{ text: 'hi', class: 'red' }]
                 })
             });
             areaMatrix.forEach(row => {
                 row.forEach(cell => {
                     cell.class = ['bg-grey']
-                    cell.message = { text: 'hi', class: 'red' }
+                    cell.message =[{ text: 'hi', class: 'red' }]
                 })
             });
         }
