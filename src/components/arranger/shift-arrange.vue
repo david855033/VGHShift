@@ -177,7 +177,10 @@ export default {
           vm.onUp();
         } else if (e.code == "ArrowLeft") {
           vm.onLeft();
+        } else if (e.code == "ArrowRight" || e.code == "Tab") {
+          vm.onRight();
         } else if (e.code == "Backspace" || e.code == "Delete") {
+          let isCellEmpty = true;
           if (updateType == "doctor") {
             //delete in doctor cell
             let doctor = rowElement;
@@ -193,12 +196,14 @@ export default {
               vm.arrange_AreaList(area, date, doctor, true);
             });
           } else if (updateType == "area") {
-            //delete in area cell **TODO preg logic
+            //delete in area cell
             let area = rowElement;
             let y = selectedArea.findIndex(
               x => x.area_abbr.indexOf(area.area_abbr) !== -1
             );
             let doctor_abbr = areaMatrix[y][date - 1].doctor_abbr;
+            let split = _.trim(doctor_abbr, "/").split("/");
+            doctor_abbr = split[split.length - 1];
             let matchDoctor = doctorList.filter(
               x => x.doctor_abbr == doctor_abbr
             );
@@ -206,14 +211,15 @@ export default {
               vm.arrange_ViewMatrix(area, date, doctor, true);
               vm.arrange_AreaList(area, date, doctor, true);
             });
+            isCellEmpty = areaMatrix[y][date - 1].doctor_abbr == "";
           }
-          if (e.code == "Backspace") {
-            vm.onLeft();
-          } else {
-            vm.onRight();
+          if (isCellEmpty) {
+            if (e.code == "Backspace") {
+              vm.onLeft();
+            } else {
+              vm.onRight();
+            }
           }
-        } else if (e.code == "ArrowRight" || e.code == "Tab") {
-          vm.onRight();
         }
       }
       if (e.key.length == 1 && !e.ctrlKey) {
@@ -331,24 +337,38 @@ export default {
     },
     //改變AreaList內容
     arrange_AreaList(area, date, doctor, clear) {
-      //TODO: doctor is pregnant + area is pregnant cover
-      //   -> push to arranged_duty_pregnant
       let areaList = this.sheetContent.areaList;
       let x = date - 1;
-      //remove duplicate in same day
+      //remove duplicate in same day(清除時不論是否pregnant)
       if (!clear) {
         areaList.forEach(row => {
-          let current_arranged_duty_array = JSON.parse(row.arranged_duty);
-          if (current_arranged_duty_array[x] == doctor.doctor_id) {
-            current_arranged_duty_array[x] = "";
+          //展開
+          let duty_array = JSON.parse(row.arranged_duty);
+          let duty_pregnent_array = JSON.parse(row.arranged_duty_pregnant);
+          //若當天有重複的人則清空
+          if (duty_array[x] == doctor.doctor_id) {
+            duty_array[x] = "";
           }
-          row.arranged_duty = JSON.stringify(current_arranged_duty_array);
+          if (duty_pregnent_array[x] == doctor.doctor_id) {
+            duty_pregnent_array[x] = "";
+          }
+          //寫入
+          row.arranged_duty = JSON.stringify(duty_array);
+          row.arranged_duty_pregnant = JSON.stringify(duty_pregnent_array);
         });
       }
-      //set new value
-      let array = JSON.parse(area.arranged_duty);
-      array[x] = clear ? "" : doctor.doctor_id;
-      area.arranged_duty = JSON.stringify(array);
+      //set new value 設定時doctor.pregnant 及 area.pregnant_cover皆為true，則設定arranged_duty_pregnant
+      if (doctor.pregnant && area.pregnant_cover) {
+        //設定懷孕值班
+        let array = JSON.parse(area.arranged_duty_pregnant);
+        array[x] = clear ? "" : doctor.doctor_id;
+        area.arranged_duty_pregnant = JSON.stringify(array);
+      } else {
+        //設定普通值班
+        let array = JSON.parse(area.arranged_duty);
+        array[x] = clear ? "" : doctor.doctor_id;
+        area.arranged_duty = JSON.stringify(array);
+      }
     },
     renderAreaMatrix() {
       //TODO: area is pregnant cover
@@ -360,12 +380,30 @@ export default {
       selectedArea.forEach((area, y) => {
         vm.$set(areaMatrix, y, []);
         let arranged_duty_array = JSON.parse(area.arranged_duty) || [];
+        let arranged_duty_pregnant_array =
+          JSON.parse(area.arranged_duty_pregnant) || [];
         vm.sheetContent.calender.forEach((d, x) => {
+          //取得duty之abbr
           let doctor_id = arranged_duty_array[x];
           let doctor_abbr =
             (doctorList.find(x => x.doctor_id == doctor_id) || {})
               .doctor_abbr || "";
-          vm.$set(areaMatrix[y], x, { doctor_abbr: doctor_abbr }); //areaMatrix初始值
+          //取得pregnant_duty之abbr (若pregnant_cover為真)
+          let doctor_abbr_pregnant = "";
+          if (area.pregnant_cover) {
+            let doctor_id_pregnant = arranged_duty_pregnant_array[x];
+            let doctor_pregnant =
+              doctorList.find(x => x.doctor_id == doctor_id_pregnant) || {};
+            if (doctor_pregnant.pregnant) {
+              doctor_abbr_pregnant = doctor_pregnant.doctor_abbr || "";
+              if (doctor_abbr_pregnant) {
+                //如果abbr有值，增加"/"於結尾
+                doctor_abbr_pregnant = doctor_abbr_pregnant + "/";
+              }
+            }
+          }
+          let set_doctor_abbr = doctor_abbr_pregnant + doctor_abbr;
+          vm.$set(areaMatrix[y], x, { doctor_abbr: set_doctor_abbr }); //areaMatrix初始值
         });
       });
       this.assignArea = {};
@@ -395,6 +433,21 @@ export default {
             }
           }
         });
+        //顯示arranged_duty_pregnant
+        if (area.pregnant_cover) {
+          let arranged_duty_pregnant_array =
+            JSON.parse(area.arranged_duty_pregnant) || [];
+          arranged_duty_pregnant_array.forEach((doctor_id, x) => {
+            if (doctor_id) {
+              let y = selectedDoctor.findIndex(
+                doctor => doctor.doctor_id == doctor_id
+              );
+              if (y >= 0 && area.area_abbr) {
+                doctorMatrix[y][x].area_abbr = area.area_abbr + "*";
+              }
+            }
+          });
+        }
       });
       this.assignDoctor = {};
     },

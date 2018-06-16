@@ -29,7 +29,7 @@ export default {
     },
     fill_AreaArrange: function (area, vm) {
         let keyList = ["area_id", "type_id", "workhour_id", "area_abbr", "description", "pregnant_cover"];
-        let arrayList = ["available_grades", "arranged_duty"];
+        let arrayList = ["available_grades", "arranged_duty", "arranged_duty_pregnant"];
         fillWithReactivity(area, vm, keyList, arrayList)
     },
     default_abbr: function () {
