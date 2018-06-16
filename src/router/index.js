@@ -16,6 +16,7 @@ import TypeArrange from '@/components/arranger/type-arrange'
 import WorkhourArrange from '@/components/arranger/workhour-arrange'
 import AreaArrange from '@/components/arranger/area-arrange'
 import ShiftArrange from '@/components/arranger/shift-arrange'
+import ShiftSummary from '@/components/arranger/shift-summary'
 
 import BookDate from '@/components/employee/book-date'
 
@@ -84,11 +85,14 @@ export default new Router({
               name: 'AreaArrange',
               component: AreaArrange,
             },
-            
             {
               path: 'shift-arrange',
               name: 'ShiftArrange',
               component: ShiftArrange,
+            },  {
+              path: 'shift-summary',
+              name: 'ShiftSummary',
+              component: ShiftSummary,
             }
           ]
         }, {

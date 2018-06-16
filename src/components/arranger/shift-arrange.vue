@@ -267,26 +267,64 @@ export default {
       });
       if (!clear) {
         //remove same doctor in areaMatrix
-        areaMatrix.forEach((row, dupli_y) => {
-          if (row[x].doctor_abbr == doctor.doctor_abbr) {
-            row[x].doctor_abbr = "";
+        areaMatrix.forEach(row => {
+          if (row[x].doctor_abbr.indexOf(doctor.doctor_abbr) !== -1) {
+            if (row[x].doctor_abbr.indexOf("/") !== -1) {
+              //原本為'A/B'格式
+              let splittedCell = row[x].doctor_abbr.split("/");
+              if (splittedCell[0] == doctor.doctor_abbr) {
+                //移除A:'A/B'改為B
+                row[x].doctor_abbr = splittedCell[1];
+              } else if (splittedCell[1] == doctor.doctor_abbr) {
+                //移除B:'A/B'改為A/
+                row[x].doctor_abbr = splittedCell[0] + "/";
+              }
+            } else {
+              row[x].doctor_abbr = "";
+            }
           }
         });
         //remove same area in doctorMatraix
+        let scan_area_abbr =
+          area.area_abbr + (doctor.pregnant && area.pregnant_cover ? "*" : "");
         doctorMatrix.forEach(row => {
-          if (row[x].area_abbr == area.area_abbr) {
+          if (row[x].area_abbr == scan_area_abbr) {
             row[x].area_abbr = "";
           }
         });
       }
+
       //rendering matched cell in areaMatrix
-      areaMatrix[y_area][x].doctor_abbr = clear ? "" : doctor.doctor_abbr;
+      if (area.pregnant_cover) {
+        let current_cell_is_pregnant =
+          areaMatrix[y_area][x].doctor_abbr.indexOf("/") !== -1;
+        let splittedCell = areaMatrix[y_area][x].doctor_abbr.split("/");
+        let replace_abbr;
+        if (doctor.pregnant) {
+          if (current_cell_is_pregnant) {
+            replace_abbr = doctor.doctor_abbr + "/" + (splittedCell[1] || "");
+          } else {
+            replace_abbr = doctor.doctor_abbr + "/";
+          }
+        } else {
+          if (current_cell_is_pregnant) {
+            replace_abbr = (splittedCell[0] || "") + "/" + doctor.doctor_abbr;
+          } else {
+            replace_abbr = doctor.doctor_abbr;
+          }
+        }
+        areaMatrix[y_area][x].doctor_abbr = clear ? "" : replace_abbr;
+      } else {
+        areaMatrix[y_area][x].doctor_abbr = clear ? "" : doctor.doctor_abbr;
+      }
       //rendering matched cell in doctorMatrix
-      doctorMatrix[y_doctor][x].area_abbr = clear ? "" : area.area_abbr;
+      doctorMatrix[y_doctor][x].area_abbr = clear
+        ? ""
+        : area.area_abbr + (doctor.pregnant && area.pregnant_cover ? "*" : "");
     },
-     //改變AreaList內容
+    //改變AreaList內容
     arrange_AreaList(area, date, doctor, clear) {
-      //TODO: doctor is pregnant + area is pregnant cover 
+      //TODO: doctor is pregnant + area is pregnant cover
       //   -> push to arranged_duty_pregnant
       let areaList = this.sheetContent.areaList;
       let x = date - 1;
@@ -326,7 +364,7 @@ export default {
       this.assignArea = {};
     },
     renderDoctorMatrix() {
-      //TODO: doctor is pregnant 
+      //TODO: doctor is pregnant
       // -> render arranged_duty_pregnant 'A*'
       let vm = this;
       let selectedDoctor = vm.selectedDoctor;
@@ -419,12 +457,12 @@ td.col-abbr {
   text-align: center;
 }
 td.cell {
-  width: 25px;
-  max-width: 25px;
+  width: 30px;
+  max-width: 30px;
 }
 input[type="text"] {
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
   text-align: center;
   box-sizing: border-box;
   -moz-box-sizing: border-box;

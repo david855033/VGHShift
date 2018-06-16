@@ -106,7 +106,7 @@
                     </td>
                     <td>
                         <select v-model="area.workhour_id">
-                            <option value=""></option>
+                            <option value="">無</option>
                             <option v-for="(workhour, ti) in sheetContent.workhourList" :key="ti">{{workhour.workhour_id}}</option>
                         </select>
                     </td>

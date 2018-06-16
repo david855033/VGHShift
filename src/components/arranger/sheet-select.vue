@@ -74,6 +74,7 @@
         <router-link tag="button" :to="'/sheet-select/workhour-arrange'" type="button" class="btn btn-sm btn-primary">workhour-arrange</router-link>
         <router-link tag="button" :to="'/sheet-select/area-arrange'" type="button" class="btn btn-sm btn-primary">area-arrange</router-link>
         <router-link tag="button" :to="'/sheet-select/shift-arrange'" type="button" class="btn btn-sm btn-primary">shift-arrange</router-link>
+        <router-link tag="button" :to="'/sheet-select/shift-summary'" type="button" class="btn btn-sm btn-primary">shift-summary</router-link>
         <button type="button" class="btn btn-sm btn-primary" @click="onSave">save</button>
         <router-link tag="button" :to="'/sheet-select'" type="button" class="btn btn-sm btn-primary" @click.native="clearSelect">go back</router-link>
       </div>

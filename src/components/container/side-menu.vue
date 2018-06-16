@@ -48,6 +48,9 @@
                     <li>
                         <router-link to="/sheet-select/shift-arrange">shift</router-link>
                     </li>
+                     <li>
+                        <router-link to="/sheet-select/shift-summary">summary</router-link>
+                    </li>
                 </ul>
             </ul>
             <li>Employee</li>
