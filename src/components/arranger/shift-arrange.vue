@@ -185,15 +185,19 @@ export default {
               x => x.doctor_abbr == doctor.doctor_abbr
             );
             let area_abbr = doctorMatrix[y][date - 1].area_abbr;
-            let matchArea = areaList.filter(x => x.area_abbr == area_abbr);
+            let matchArea = areaList.filter(
+              x => area_abbr.indexOf(x.area_abbr) !== -1
+            );
             matchArea.forEach(area => {
               vm.arrange_ViewMatrix(area, date, doctor, true);
               vm.arrange_AreaList(area, date, doctor, true);
             });
           } else if (updateType == "area") {
-            //delete in area cell
+            //delete in area cell **TODO preg logic
             let area = rowElement;
-            let y = selectedArea.findIndex(x => x.area_abbr == area.area_abbr);
+            let y = selectedArea.findIndex(
+              x => x.area_abbr.indexOf(area.area_abbr) !== -1
+            );
             let doctor_abbr = areaMatrix[y][date - 1].doctor_abbr;
             let matchDoctor = doctorList.filter(
               x => x.doctor_abbr == doctor_abbr
@@ -293,27 +297,30 @@ export default {
           }
         });
       }
-
       //rendering matched cell in areaMatrix
       if (area.pregnant_cover) {
         let current_cell_is_pregnant =
           areaMatrix[y_area][x].doctor_abbr.indexOf("/") !== -1;
         let splittedCell = areaMatrix[y_area][x].doctor_abbr.split("/");
-        let replace_abbr;
+        let replace_abbr, clear_abbr;
         if (doctor.pregnant) {
           if (current_cell_is_pregnant) {
             replace_abbr = doctor.doctor_abbr + "/" + (splittedCell[1] || "");
+            clear_abbr = splittedCell[1] || "";
           } else {
-            replace_abbr = doctor.doctor_abbr + "/";
+            replace_abbr = doctor.doctor_abbr + "/" + (splittedCell[0] || "");
+            clear_abbr = "";
           }
         } else {
           if (current_cell_is_pregnant) {
             replace_abbr = (splittedCell[0] || "") + "/" + doctor.doctor_abbr;
+            clear_abbr = (splittedCell[0] || "") + "/";
           } else {
             replace_abbr = doctor.doctor_abbr;
+            clear_abbr = "";
           }
         }
-        areaMatrix[y_area][x].doctor_abbr = clear ? "" : replace_abbr;
+        areaMatrix[y_area][x].doctor_abbr = clear ? clear_abbr : replace_abbr;
       } else {
         areaMatrix[y_area][x].doctor_abbr = clear ? "" : doctor.doctor_abbr;
       }
