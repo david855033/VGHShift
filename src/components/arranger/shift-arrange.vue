@@ -21,9 +21,9 @@
             </td>
           </tr>
           <tr v-for="(area,y) in selectedArea" :key="y">
-            <td class="col-description" @click="setAssignArea(area)">{{area.description}}</td>
+            <td class="col-description" :class="{selected:area==assignArea}" @click="setAssignArea(area)">{{area.description}}</td>
             <td class="col-abbr" @click="setAssignArea(area)">{{area.area_abbr}}</td>
-            <td class="cell" v-for="(e,x) in sheetContent.calender" :key="x" @click="focus(x,y)">
+            <td class="cell" v-for="(e,x) in sheetContent.calender" :class="((areaMatrix[y]||[])[x]||{}).class" :key="x" @click="focus(x,y)">
               <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="((areaMatrix[y]||[])[x]||{}).doctor_abbr" @input="onAreaInput($event,y,x)" @click="onAreaCellClick(area,x)">
             </td>
           </tr>
@@ -38,10 +38,10 @@
             </td>
           </tr>
           <tr v-for="(doctor,y) in selectedDoctor" :key="y+selectedArea.length">
-            <td class="col-description" @click="setAssignDoctor(doctor)">{{doctor.name}}</td>
+            <td class="col-description" :class="{selected:doctor==assignDoctor}" @click="setAssignDoctor(doctor)">{{doctor.name}}</td>
             <td class="col-abbr" @click="setAssignDoctor(doctor)">{{doctor.doctor_abbr}}</td>
-            <td class="cell" v-for="(e,x) in sheetContent.calender" :key="x" @click="focus(x,y+selectedArea.length)">
-              <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" @keydown.prevent="onAnyKey($event,e,'doctor' ,doctor)" @focus="focus(x, y+selectedArea.length)" :value="((doctorMatrix[y]||[])[x]||{}).area_abbr" @input="onDoctorInput($event,y,x)" @click="onDoctorCellClick(doctor,x)">
+            <td class="cell" v-for="(e,x) in sheetContent.calender" :key="x" :class="((doctorMatrix[y]||[])[x]||{}).class" @click="focus(x,y+selectedArea.length)">
+              <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" :value="((doctorMatrix[y]||[])[x]||{}).area_abbr" @keydown.prevent="onAnyKey($event,e,'doctor' ,doctor)" @focus="focus(x, y+selectedArea.length)" @input="onDoctorInput($event,y,x)" @click="onDoctorCellClick(doctor,x)">
             </td>
           </tr>
         </tbody>
@@ -50,6 +50,7 @@
   </div>
 </template>
 <script>
+import shiftChecker from "./shift-checker";
 export default {
   props: ["sheetContent", "sheetYear", "sheetMonth"],
   data() {
@@ -369,12 +370,14 @@ export default {
         array[x] = clear ? "" : doctor.doctor_id;
         area.arranged_duty = JSON.stringify(array);
       }
+      shiftChecker.check(this, {area,date,doctor});
     },
     renderAreaMatrix() {
       //TODO: area is pregnant cover
       // -> render arranged_duty_pregnant as 'A/B'
       let vm = this;
       let doctorList = vm.sheetContent.doctorList;
+      let areaList = vm.sheetContent.areaList;
       let selectedArea = vm.selectedArea;
       let areaMatrix = vm.areaMatrix;
       selectedArea.forEach((area, y) => {
@@ -382,6 +385,7 @@ export default {
         let arranged_duty_array = JSON.parse(area.arranged_duty) || [];
         let arranged_duty_pregnant_array =
           JSON.parse(area.arranged_duty_pregnant) || [];
+        let areaList_y = areaList.findIndex(x => x.area_id == area.area_id);
         vm.sheetContent.calender.forEach((d, x) => {
           //取得duty之abbr
           let doctor_id = arranged_duty_array[x];
@@ -403,14 +407,16 @@ export default {
             }
           }
           let set_doctor_abbr = doctor_abbr_pregnant + doctor_abbr;
-          vm.$set(areaMatrix[y], x, { doctor_abbr: set_doctor_abbr }); //areaMatrix初始值
+          vm.$set(areaMatrix[y], x, {
+            doctor_abbr: set_doctor_abbr,
+            class: [],
+            message: []
+          }); //areaMatrix初始值
         });
       });
       this.assignArea = {};
     },
     renderDoctorMatrix() {
-      //TODO: doctor is pregnant
-      // -> render arranged_duty_pregnant 'A*'
       let vm = this;
       let selectedDoctor = vm.selectedDoctor;
       let doctorMatrix = vm.doctorMatrix;
@@ -418,7 +424,11 @@ export default {
       selectedDoctor.forEach((doctor, y) => {
         vm.$set(doctorMatrix, y, []);
         vm.sheetContent.calender.forEach((d, x) => {
-          vm.$set(doctorMatrix[y], x, { area_abbr: "" }); //doctorMatrix初始值
+          //doctorMatrix初始值
+          vm.$set(doctorMatrix[y], x, {
+            area_abbr: "",
+            class: []
+          });
         });
       });
       areaList.forEach(area => {
@@ -474,17 +484,20 @@ export default {
   mounted() {
     this.renderAreaMatrix();
     this.renderDoctorMatrix();
+    shiftChecker.check(this);
   },
   watch: {
     checkedArea: {
       handler() {
         this.renderAreaMatrix();
+        shiftChecker.check(this);
       },
       deep: true
     },
     checkedDoctor: {
       handler() {
         this.renderDoctorMatrix();
+        shiftChecker.check(this);
       },
       deep: true
     }
@@ -509,16 +522,37 @@ th {
   text-align: center;
 }
 table {
-  max-width: 1000px;
+  max-width: 1100px;
 }
-td.col-abbr {
-  width: 40px;
-  background: whitesmoke;
-  text-align: center;
-}
-td.cell {
-  width: 30px;
-  max-width: 30px;
+
+$color-hover: hsl(40, 90, 95);
+$color-select: hsl(40, 90, 90);
+td {
+  vertical-align: middle;
+  &.col-description {
+    cursor: pointer;
+    &:hover {
+      background-color: $color-hover;
+    }
+    &.selected {
+      background-color: $color-select;
+    }
+  }
+  &.col-abbr {
+    cursor: pointer;
+    width: 40px;
+    background: whitesmoke;
+    text-align: center;
+  }
+  &.cell {
+    width: 30px;
+    max-width: 30px;
+    border: 1px solid hsl(0, 0, 90);
+    input {
+      border: 0px;
+      background-color: transparent;
+    }
+  }
 }
 input[type="text"] {
   width: 30px;
