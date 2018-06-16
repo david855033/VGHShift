@@ -43,5 +43,25 @@ export default {
             output.push(String.fromCharCode(start2 + i))
         }
         return output;
+    },
+    dayToWeekDay(day){
+        if(day==0){
+            return "日"
+        }else if(day==1){
+            return "一"
+        }else if(day==2){
+            return "二"
+        }else if(day==3){
+            return "三"
+        }else if(day==4){
+            return "四"
+        }else if(day==5){
+            return "五"
+        }else if(day==6){
+            return "六"
+        }else if(day==7){
+            return "日"
+        }
+        return "";
     }
 }

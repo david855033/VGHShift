@@ -1,29 +1,37 @@
 td.cell {
     position: relative;
-    &.bg-grey {
-        border: 1px solid hsl(0, 0, 80);
-        background-color: hsl(0, 0, 90);
+    &.holiday {
+        div {
+            border: 1px solid hsl(0, 10, 85);
+            margin: -1px;
+        }
+        background-color: hsl(0, 30, 95);
     }
 }
 
-td.cell>span {
+td.cell span {
+    pointer-events: none ;
     visibility: hidden;
+    position: absolute;
     font-size: 0.8em;
     text-align: center;
     border-radius: 3px;
-    position: absolute;
     z-index: 1;
     padding: 0px 5px;
-    top: -55%;
+    top: -70%;
     left: 5px;
+    background-color: hsl(0, 30, 85);
+    opacity:0;
+    transition: opacity 0.5s;
     &::after {
         content: " ";
         position: absolute;
         top: 100%;
-        left: 50%;
+        left: 10px;
         margin-left: -5px;
         border-width: 5px;
         border-style: solid;
+        border-color: hsl(0, 30, 85) transparent transparent transparent;
     }
     &.red {
         background-color: red;
@@ -31,8 +39,16 @@ td.cell>span {
             border-color: red transparent transparent transparent;
         }
     }
+    &.green {
+        background-color: green;
+        &::after {
+            border-color: green transparent transparent transparent;
+        }
+    }
 }
 
-td.cell:hover>span,input:focus+span,td.cell>span.show {
+td.cell:hover span,
+input:focus+span {
+    opacity:1;
     visibility: visible;
 }

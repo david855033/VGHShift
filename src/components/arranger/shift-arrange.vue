@@ -8,6 +8,10 @@
             <th colspan="2">日期</th>
             <th v-for="(e,i) in sheetContent.calender" :key="i">{{new Date(e.date).getDate()}}</th>
           </tr>
+          <tr>
+            <th colspan="2"></th>
+            <th v-for="(e,i) in sheetContent.calender" :key="i" :class='{"holiday":e.is_holiday}'>{{weekDay(e.date)}}</th>
+          </tr>
         </thead>
         <tbody>
           <tr>
@@ -24,10 +28,12 @@
             <td class="col-description" :class="{selected:area==assignArea}" @click="setAssignArea(area)">{{area.description}}</td>
             <td class="col-abbr" @click="setAssignArea(area)">{{area.area_abbr}}</td>
             <td class="cell" v-for="(e,x) in sheetContent.calender" :class="((areaMatrix[y]||[])[x]||{}).class" :key="x" @click="focus(x,y)">
-              <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="((areaMatrix[y]||[])[x]||{}).doctor_abbr" @input="onAreaInput($event,y,x)" @click="onAreaCellClick(area,x)">
-              <span v-for="(message, message_index) in ((areaMatrix[y]||[])[x]||{}).message" :class="message.class" :key="message_index">
-                {{message.text}}
-              </span>
+              <div>
+                <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="((areaMatrix[y]||[])[x]||{}).doctor_abbr" @input="onAreaInput($event,y,x)" @click="onAreaCellClick(area,x)">
+                <span :class="((((areaMatrix[y]||[])[x]||{}).message)||{}).class" v-if="(((areaMatrix[y]||[])[x]||{}).message||{}).text">
+                  {{(((areaMatrix[y]||[])[x]||{}).message||{}).text}}
+                </span>
+              </div>
             </td>
           </tr>
           <tr>
@@ -44,7 +50,12 @@
             <td class="col-description" :class="{selected:doctor==assignDoctor}" @click="setAssignDoctor(doctor)">{{doctor.name}}</td>
             <td class="col-abbr" @click="setAssignDoctor(doctor)">{{doctor.doctor_abbr}}</td>
             <td class="cell" v-for="(e,x) in sheetContent.calender" :key="x" :class="((doctorMatrix[y]||[])[x]||{}).class" @click="focus(x,y+selectedArea.length)">
-              <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" :value="((doctorMatrix[y]||[])[x]||{}).area_abbr" @keydown.prevent="onAnyKey($event,e,'doctor' ,doctor)" @focus="focus(x, y+selectedArea.length)" @input="onDoctorInput($event,y,x)" @click="onDoctorCellClick(doctor,x)">
+              <div>
+                <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" :value="((doctorMatrix[y]||[])[x]||{}).area_abbr" @keydown.prevent="onAnyKey($event,e,'doctor' ,doctor)" @focus="focus(x, y+selectedArea.length)" @input="onDoctorInput($event,y,x)" @click="onDoctorCellClick(doctor,x)">
+                <span :class="((((doctorMatrix[y]||[])[x]||{}).message)||{}).class" v-if="(((doctorMatrix[y]||[])[x]||{}).message||{}).text">
+                  {{(((doctorMatrix[y]||[])[x]||{}).message||{}).text}}
+                </span>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -54,6 +65,7 @@
 </template>
 <script>
 import shiftChecker from "./shift-checker";
+import util from "@/components/my-util";
 export default {
   props: ["sheetContent", "sheetYear", "sheetMonth"],
   data() {
@@ -81,13 +93,13 @@ export default {
     },
     selectedDoctor() {
       let vm = this;
-      if (vm.checkedDoctor.length == 0) {
-        return vm.sheetContent.doctorList;
-      } else {
-        return vm.sheetContent.doctorList.filter(
-          x => vm.checkedDoctor.indexOf(x.grade) >= 0
-        );
-      }
+      // if (vm.checkedDoctor.length == 0) {
+      //   return vm.sheetContent.doctorList;
+      // } else {
+      return vm.sheetContent.doctorList.filter(
+        x => vm.checkedDoctor.indexOf(x.grade) >= 0
+      );
+      // }
     },
     distinctAreaAbbr() {
       let vm = this;
@@ -113,6 +125,9 @@ export default {
     }
   },
   methods: {
+    weekDay(date) {
+      return util.dayToWeekDay(new Date(date).getDay());
+    },
     focus(x, y) {
       this.focus_x = x;
       this.focus_y = y;
@@ -509,9 +524,13 @@ export default {
 </script>
 <style lang="scss" scoped >
 @import "./shift-arrange.scss";
-.table {
+table {
+  max-width: 1250px;
   margin: auto;
+  border-collapse: collapse;
+  border-spacing: 0px;
 }
+
 h5 {
   margin-top: 10px;
 }
@@ -523,9 +542,10 @@ th {
 }
 th {
   text-align: center;
-}
-table {
-  max-width: 1250px;
+  font-size: 0.9em;
+  &.holiday {
+    color: hsl(0, 60, 40);
+  }
 }
 
 $color-hover: hsl(40, 90, 95);

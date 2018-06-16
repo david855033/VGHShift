@@ -1,23 +1,26 @@
 export default {
-    check(vm,changed) {
-        this.test.check(vm,changed)
-        console.log('checking: changed=',changed)
+    check(vm, changed) {
+        this.holiday.check(vm, changed)
+        console.log('checking: changed=', changed)
     },
-    test: {
-        description: "test",
+    holiday: {
+        description: "holiday",
         check(vm) {
             let { areaList, doctorList, calender } = vm.sheetContent
             let { selectedArea, areaMatrix, selectedDoctor, doctorMatrix } = vm
             doctorMatrix.forEach(row => {
-                row.forEach(cell => {
-                    cell.class = ['bg-grey']
-                    cell.message = [{ text: 'hi', class: 'red' }]
+                calender.forEach((x, i) => {
+                    if (x.is_holiday) {
+                        row[i].class = ['holiday']
+                    }
                 })
             });
             areaMatrix.forEach(row => {
-                row.forEach(cell => {
-                    cell.class = ['bg-grey']
-                    cell.message =[{ text: 'hi', class: 'red' }]
+                calender.forEach((x, i) => {
+                    if (x.is_holiday) {
+                        row[i].class = ['holiday']
+                        // row[i].message = { text: 'holiday', class: 'green' } for example
+                    }
                 })
             });
         }
