@@ -1,3 +1,6 @@
+$bgcolor-highlight: hsl(40, 100, 90);
+$border-highlight: hsl(40, 100, 80);
+
 td.cell {
     position: relative;
     &.holiday {
@@ -9,8 +12,16 @@ td.cell {
     }
 }
 
+div.highlight {
+    background-color: $bgcolor-highlight;
+    border: 1px solid $border-highlight!important;
+    margin: -1px;
+}
+
+
+/*tooltip CSS*/
 td.cell span {
-    pointer-events: none ;
+    pointer-events: none;
     visibility: hidden;
     position: absolute;
     font-size: 0.8em;
@@ -21,7 +32,7 @@ td.cell span {
     top: -70%;
     left: 5px;
     background-color: hsl(0, 30, 85);
-    opacity:0;
+    opacity: 0;
     transition: opacity 0.5s;
     &::after {
         content: " ";
@@ -49,6 +60,6 @@ td.cell span {
 
 td.cell:hover span,
 input:focus+span {
-    opacity:1;
+    opacity: 1;
     visibility: visible;
 }

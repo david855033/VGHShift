@@ -5,17 +5,18 @@
       <table class="table table-sm">
         <thead>
           <tr>
-            <th colspan="2">日期</th>
+            <th colspan="3">日期</th>
             <th v-for="(e,i) in sheetContent.calender" :key="i">{{new Date(e.date).getDate()}}</th>
           </tr>
           <tr>
-            <th colspan="2"></th>
+            <th colspan="3"></th>
             <th v-for="(e,i) in sheetContent.calender" :key="i" :class='{"holiday":e.is_holiday}'>{{weekDay(e.date)}}</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td colspan="2">以區排人</td>
+            <td></td>
             <td :colspan="sheetContent.calender.length">
               過濾器：
               <div class="form-check form-check-inline" v-for="(e, i) in distinctAreaAbbr" :key="i">
@@ -26,9 +27,10 @@
           </tr>
           <tr v-for="(area,y) in selectedArea" :key="y">
             <td class="col-description" :class="{selected:area==assignArea}" @click="setAssignArea(area)">{{area.description}}</td>
-            <td class="col-abbr" @click="setAssignArea(area)">{{area.area_abbr}}</td>
+            <td class="col-abbr" :class="{selected:area==assignArea}" @click="setAssignArea(area)">{{area.area_abbr}}</td>
+            <td class="col-summary"></td>
             <td class="cell" v-for="(e,x) in sheetContent.calender" :class="((areaMatrix[y]||[])[x]||{}).class" :key="x" @click="focus(x,y)">
-              <div>
+              <div :class='{"highlight":((areaMatrix[y]||[])[x]||{}).doctor_abbr.indexOf(assignDoctor.doctor_abbr)!==-1}'>
                 <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="((areaMatrix[y]||[])[x]||{}).doctor_abbr" @input="onAreaInput($event,y,x)" @click="onAreaCellClick(area,x)">
                 <span :class="((((areaMatrix[y]||[])[x]||{}).message)||{}).class" v-if="(((areaMatrix[y]||[])[x]||{}).message||{}).text">
                   {{(((areaMatrix[y]||[])[x]||{}).message||{}).text}}
@@ -38,6 +40,7 @@
           </tr>
           <tr>
             <td :colspan="2">以人排區</td>
+            <td></td>
             <td :colspan="sheetContent.calender.length">
               過濾器：
               <div class="form-check form-check-inline" v-for="(e, i) in distrinctDoctorGrade" :key="i">
@@ -48,9 +51,10 @@
           </tr>
           <tr v-for="(doctor,y) in selectedDoctor" :key="y+selectedArea.length">
             <td class="col-description" :class="{selected:doctor==assignDoctor}" @click="setAssignDoctor(doctor)">{{doctor.name}}</td>
-            <td class="col-abbr" @click="setAssignDoctor(doctor)">{{doctor.doctor_abbr}}</td>
+            <td class="col-abbr" :class="{selected:doctor==assignDoctor}" @click="setAssignDoctor(doctor)">{{doctor.doctor_abbr}}</td>
+            <td class="col-summary">{{summary(doctor)}}</td>
             <td class="cell" v-for="(e,x) in sheetContent.calender" :key="x" :class="((doctorMatrix[y]||[])[x]||{}).class" @click="focus(x,y+selectedArea.length)">
-              <div>
+              <div :class='{"highlight":((doctorMatrix[y]||[])[x]||{}).area_abbr.indexOf(assignArea.area_abbr)!==-1}'>
                 <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" :value="((doctorMatrix[y]||[])[x]||{}).area_abbr" @keydown.prevent="onAnyKey($event,e,'doctor' ,doctor)" @focus="focus(x, y+selectedArea.length)" @input="onDoctorInput($event,y,x)" @click="onDoctorCellClick(doctor,x)">
                 <span :class="((((doctorMatrix[y]||[])[x]||{}).message)||{}).class" v-if="(((doctorMatrix[y]||[])[x]||{}).message||{}).text">
                   {{(((doctorMatrix[y]||[])[x]||{}).message||{}).text}}
@@ -125,6 +129,9 @@ export default {
     }
   },
   methods: {
+    summary(doctor){
+      return doctor.doctor_id
+    },
     weekDay(date) {
       return util.dayToWeekDay(new Date(date).getDay());
     },
@@ -525,7 +532,6 @@ export default {
 <style lang="scss" scoped >
 @import "./shift-arrange.scss";
 table {
-  max-width: 1250px;
   margin: auto;
   border-collapse: collapse;
   border-spacing: 0px;
@@ -550,9 +556,12 @@ th {
 
 $color-hover: hsl(40, 90, 95);
 $color-select: hsl(40, 90, 90);
+$color-select-abbr: hsl(40, 90, 85);
+
 td {
   vertical-align: middle;
   &.col-description {
+    min-width: 80px;
     cursor: pointer;
     &:hover {
       background-color: $color-hover;
@@ -563,12 +572,21 @@ td {
   }
   &.col-abbr {
     cursor: pointer;
-    width: 40px;
+    min-width: 30px;
     background: whitesmoke;
     text-align: center;
+    &:hover {
+      background-color: $color-hover;
+    }
+    &.selected {
+      background-color: $color-select-abbr;
+    }
+  }
+  &.col-summary {
+    width: 80px;
+    min-width: 80px;
   }
   &.cell {
-    width: 30px;
     min-width: 35px;
     border: 1px solid hsl(0, 0, 90);
     input {
