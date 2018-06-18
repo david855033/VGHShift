@@ -1,7 +1,8 @@
 <template>
     <div>
-        <div id="sheet-selector" v-if="selectedSheetID==''">
+        <div id="sheet-selector">
             <h4>Sheet Select (publish sheet)</h4>
+            <button class='btn btn-sm btn-primary py-0 my-2' @click="querySheetList">Query</button>
             <table class="table">
                 <thead>
                     <tr>
@@ -14,7 +15,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(sheet,i) in sheetQueryResult" :key="i">
+                    <tr v-for="(sheet,i) in sheetQueryResult" :key="i" @click="selectSheet(sheet.sheet_id)">
                         <td>{{sheet.sheet_id}}</td>
                         <td>{{sheet.year}}</td>
                         <td>{{sheet.month}}</td>
@@ -25,6 +26,14 @@
                 </tbody>
             </table>
         </div>
+        <div class="buttons" v-if="selectedSheet.sheet_id">
+            <router-link tag="button" :to="'/sheet-query/sheet-view'" type="button" class="btn btn-sm btn-primary">doctor-arrange</router-link>
+            <router-link tag="button" :to="'/sheet-query'" type="button" class="btn btn-sm btn-primary" @click.native="clearSelect">go back</router-link>
+        </div>
+        <div class="views" v-if="selectedSheet.sheet_id">
+            {{selectedSheet.sheet_id}}
+            <router-view></router-view>
+        </div>
     </div>
 </template>
 <script>
@@ -32,11 +41,32 @@ import { mapGetters } from "vuex";
 export default {
   data() {
     return {
-        selectedSheetID:'',
-        sheetQueryResult:[]
+      selectedSheet: {},
+      sheetQueryResult: []
     };
   },
-  computed: mapGetters({})
+  //TODO
+  computed: mapGetters({
+    getSheetByID: "getSheetByID",
+    querySheetListBy: "querySheetListBy"
+  }),
+  methods: {
+    querySheetList() {
+      let vm = this;
+      vm.sheetQueryResult = vm.querySheetListBy();
+    },
+    selectSheet(sheet_id) {
+      let vm = this;
+      vm.selectedSheet = vm.getSheetByID(sheet_id); //從store中取出sheet
+    },
+    clearSelect() {
+      let vm = this;
+      vm.selectedSheet = {};
+    }
+  },
+  mounted() {
+    this.querySheetList();
+  }
 };
 </script>
 

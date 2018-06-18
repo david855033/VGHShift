@@ -54,5 +54,10 @@ export default {
             let date = new Date(x.date);
             return date.getFullYear() == year && (date.getMonth() + 1) == month
         })
+    },
+    querySheetListBy: state => payload => {
+        return state.sheetTable.filter(x =>
+            x.status == "published"
+        )
     }
 }

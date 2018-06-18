@@ -21,6 +21,7 @@ import ShiftSummary from '@/components/arranger/shift-summary'
 import BookDate from '@/components/employee/book-date'
 
 import SheetQuery from '@/components/querier/sheet-query'
+import SheetView from '@/components/querier/sheet-view'
 
 Vue.use(Router)
 
@@ -89,7 +90,7 @@ export default new Router({
               path: 'shift-arrange',
               name: 'ShiftArrange',
               component: ShiftArrange,
-            },  {
+            }, {
               path: 'shift-summary',
               name: 'ShiftSummary',
               component: ShiftSummary,
@@ -104,6 +105,12 @@ export default new Router({
           path: '/sheet-query',
           name: 'SheetQuery',
           component: SheetQuery,
+          children: [{
+            path: 'sheet-view',
+            name: 'SheetView',
+            component: SheetView,
+          }
+          ]
         }
       ]
     }

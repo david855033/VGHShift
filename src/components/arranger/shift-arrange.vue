@@ -30,7 +30,7 @@
             <td class="col-abbr" :class="{selected:area==assignArea}" @click="setAssignArea(area)">{{area.area_abbr}}</td>
             <td class="col-summary"></td>
             <td class="cell" v-for="(e,x) in sheetContent.calender" :class="((areaMatrix[y]||[])[x]||{}).class" :key="x" @click="focus(x,y)">
-              <div :class='{"highlight":((areaMatrix[y]||[])[x]||{}).doctor_abbr.indexOf(assignDoctor.doctor_abbr)!==-1}'>
+              <div :class='{"highlight":(((areaMatrix[y]||[])[x]||{}).doctor_abbr||"").indexOf(assignDoctor.doctor_abbr)!==-1}'>
                 <input type="text" v-show="true" :x="x" :y="y" @keydown.prevent="onAnyKey($event, e,'area', area)" @focus="focus(x, y)" :value="((areaMatrix[y]||[])[x]||{}).doctor_abbr" @input="onAreaInput($event,y,x)" @click="onAreaCellClick(area,x)">
                 <span :class="((((areaMatrix[y]||[])[x]||{}).message)||{}).class" v-if="(((areaMatrix[y]||[])[x]||{}).message||{}).text">
                   {{(((areaMatrix[y]||[])[x]||{}).message||{}).text}}
@@ -54,7 +54,7 @@
             <td class="col-abbr" :class="{selected:doctor==assignDoctor}" @click="setAssignDoctor(doctor)">{{doctor.doctor_abbr}}</td>
             <td class="col-summary">{{summary(doctor)}}</td>
             <td class="cell" v-for="(e,x) in sheetContent.calender" :key="x" :class="((doctorMatrix[y]||[])[x]||{}).class" @click="focus(x,y+selectedArea.length)">
-              <div :class='{"highlight":((doctorMatrix[y]||[])[x]||{}).area_abbr.indexOf(assignArea.area_abbr)!==-1}'>
+              <div :class='{"highlight":(((doctorMatrix[y]||[])[x]||{}).area_abbr||"").indexOf(assignArea.area_abbr)!==-1}'>
                 <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" :value="((doctorMatrix[y]||[])[x]||{}).area_abbr" @keydown.prevent="onAnyKey($event,e,'doctor' ,doctor)" @focus="focus(x, y+selectedArea.length)" @input="onDoctorInput($event,y,x)" @click="onDoctorCellClick(doctor,x)">
                 <span :class="((((doctorMatrix[y]||[])[x]||{}).message)||{}).class" v-if="(((doctorMatrix[y]||[])[x]||{}).message||{}).text">
                   {{(((doctorMatrix[y]||[])[x]||{}).message||{}).text}}
