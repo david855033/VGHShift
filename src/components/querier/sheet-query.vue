@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div id="sheet-selector">
+        <div id="sheet-selector"  v-if="!selectedSheet.sheet_id">
             <h4>Sheet Select (publish sheet)</h4>
             <button class='btn btn-sm btn-primary py-0 my-2' @click="querySheetList">Query</button>
             <table class="table">
@@ -27,12 +27,12 @@
             </table>
         </div>
         <div class="buttons" v-if="selectedSheet.sheet_id">
-            <router-link tag="button" :to="'/sheet-query/sheet-view'" type="button" class="btn btn-sm btn-primary">doctor-arrange</router-link>
+            <router-link tag="button" :to="'/sheet-query/sheet-view'" type="button" class="btn btn-sm btn-primary">傳統檢視</router-link>
             <router-link tag="button" :to="'/sheet-query'" type="button" class="btn btn-sm btn-primary" @click.native="clearSelect">go back</router-link>
         </div>
         <div class="views" v-if="selectedSheet.sheet_id">
             {{selectedSheet.sheet_id}}
-            <router-view></router-view>
+            <router-view :sheet.sync="selectedSheet"></router-view>
         </div>
     </div>
 </template>

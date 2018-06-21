@@ -56,7 +56,7 @@
             <td class="cell" v-for="(e,x) in sheetContent.calender" :key="x" :class="((doctorMatrix[y]||[])[x]||{}).class" @click="focus(x,y+selectedArea.length)">
               <div :class='{"highlight":(((doctorMatrix[y]||[])[x]||{}).area_abbr||"").indexOf(assignArea.area_abbr)!==-1}'>
                 <input type="text" v-show="true" :x="x" :y="y+selectedArea.length" :value="((doctorMatrix[y]||[])[x]||{}).area_abbr" @keydown.prevent="onAnyKey($event,e,'doctor' ,doctor)" @focus="focus(x, y+selectedArea.length)" @input="onDoctorInput($event,y,x)" @click="onDoctorCellClick(doctor,x)">
-                <span :class="((((doctorMatrix[y]||[])[x]||{}).message)||{}).class" v-if="(((doctorMatrix[y]||[])[x]||{}).message||{}).text">
+                <span :class="((((doctorMatrix[y]||[])[x]||{}).message)||{}).class " v-if="(((doctorMatrix[y]||[])[x]||{}).message||{}).text ">
                   {{(((doctorMatrix[y]||[])[x]||{}).message||{}).text}}
                 </span>
               </div>
@@ -129,8 +129,8 @@ export default {
     }
   },
   methods: {
-    summary(doctor){
-      return doctor.doctor_id
+    summary(doctor) {
+      return doctor.doctor_id;
     },
     weekDay(date) {
       return util.dayToWeekDay(new Date(date).getDay());
@@ -160,6 +160,14 @@ export default {
       }
     },
     onDoctorCellClick(doctor, x) {
+      let vm = this;
+      let assignArea = vm.assignArea;
+      if (assignArea.type_id) {
+        vm.arrange_ViewMatrix(assignArea, x + 1, doctor);
+        vm.arrange_AreaList(assignArea, x + 1, doctor);
+      }
+    },
+    onDoctorCellRightClick(doctor, x) {
       let vm = this;
       let assignArea = vm.assignArea;
       if (assignArea.type_id) {
@@ -205,11 +213,16 @@ export default {
           vm.onLeft();
         } else if (e.code == "ArrowRight" || e.code == "Tab") {
           vm.onRight();
+        } else if (e.code == "Enter" || e.code == "Escape") {
+          let focus_input = $(
+            "input[x = " + vm.focus_x + "][y = " + vm.focus_y + "]"
+          );
+          focus_input.blur();
         } else if (e.code == "Backspace" || e.code == "Delete") {
           let isCellEmpty = true;
           if (updateType == "doctor") {
             //delete in doctor cell
-            let doctor = rowElement;
+            let doctor= rowElement;
             let y = selectedDoctor.findIndex(
               x => x.doctor_abbr == doctor.doctor_abbr
             );
@@ -352,14 +365,21 @@ export default {
             clear_abbr = "";
           }
         }
-        areaMatrix[y_area][x].doctor_abbr = clear ? clear_abbr : replace_abbr;
+        if (y_area >= 0) {
+          areaMatrix[y_area][x].doctor_abbr = clear ? clear_abbr : replace_abbr;
+        }
       } else {
-        areaMatrix[y_area][x].doctor_abbr = clear ? "" : doctor.doctor_abbr;
+        if (y_area >= 0) {
+          areaMatrix[y_area][x].doctor_abbr = clear ? "" : doctor.doctor_abbr;
+        }
       }
       //rendering matched cell in doctorMatrix
-      doctorMatrix[y_doctor][x].area_abbr = clear
-        ? ""
-        : area.area_abbr + (doctor.pregnant && area.pregnant_cover ? "*" : "");
+      if (y_doctor >= 0) {
+        doctorMatrix[y_doctor][x].area_abbr = clear
+          ? ""
+          : area.area_abbr +
+            (doctor.pregnant && area.pregnant_cover ? "*" : "");
+      }
     },
     //改變AreaList內容
     arrange_AreaList(area, date, doctor, clear) {
